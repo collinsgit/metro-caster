@@ -3,6 +3,7 @@
 
 #include <Vector3f.h>
 
+#include "Ray.h"
 #include "Object3D.h"
 
 #include <limits>
@@ -21,7 +22,7 @@ class Light
                                  Vector3f &intensity, 
                                  float &distToLight) const = 0;
 
-    virtual Ray emit();
+    virtual Ray emit() const = 0;
 };
 
 class DirectionalLight : public Light
@@ -37,7 +38,7 @@ class DirectionalLight : public Light
         Vector3f &intensity,
         float &distToLight) const override;
 
-    virtual Ray emit();
+    virtual Ray emit() const override;
 
   private:
     Vector3f _direction;
@@ -58,7 +59,7 @@ class PointLight : public Light
         Vector3f &intensity,
         float &distToLight) const override;
 
-    virtual Ray emit();
+    virtual Ray emit() const override;
 
   private:
     Vector3f _position;

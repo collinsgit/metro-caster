@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "Ray.h"
 #include "SceneParser.h"
 #include "ArgParser.h"
 

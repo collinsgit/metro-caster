@@ -100,16 +100,16 @@ std::vector<Ray> Renderer::choosePath(const Ray &r,
     return path;
 }
 
-Vector3f colorPath(std::vector<Ray> path)
+Vector3f Renderer::colorPath(std::vector<Ray> path)
 {
     Vector3f color;
 
     return color;
 }
 
-float probPath(std::vector<Ray> path)
+float Renderer::probPath(std::vector<Ray> path)
 {
-    float prob;
+    float prob = 1;
 
     return prob;
 }
@@ -140,7 +140,7 @@ void Renderer::Render()
             Ray r = cam->generateRay(Vector2f(ndcx, ndcy));
 
             Hit hit;
-            Vector3f color = estimatePixel(r, cam->getTMin(), _args.bounces);
+            Vector3f color = estimatePixel(r, cam->getTMin(), _args.bounces, iters);
             // Vector3f color = traceRay(r, cam->getTMin(), _args.bounces, hit, 1.f);
 
             image.setPixel(x, y, color);

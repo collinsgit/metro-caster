@@ -1,7 +1,8 @@
 #include "Light.h"
+#include "Ray.h"
 
 #include <random>
-#include <math.h>
+#include <cmath>
 
     void DirectionalLight::getIllumination(const Vector3f &p, 
                                  Vector3f &tolight, 
@@ -18,7 +19,7 @@
         // END STARTER
     }
 
-    Ray DirectionalLight::emit()
+    Ray DirectionalLight::emit() const
     {
         Ray ray(Vector3f(0., 0., 0.), _direction);
         return ray;
@@ -38,7 +39,7 @@
         intensity = _color / (_falloff * (float)pow(distToLight, 2));
     }
 
-    Ray PointLight::emit()
+    Ray PointLight::emit() const
     {
         std::default_random_engine generator;
         std::uniform_real_distribution<float> theta_dist(0., 2*M_PI);
