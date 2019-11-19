@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(a4)
+project(metrocaster)
 
 # Silence warnings about deprecated GLUT functions
 if(APPLE)
@@ -58,6 +58,6 @@ set (STB_SRC
 SOURCE_GROUP(stb FILES ${STB_SRC})
 
 
-add_executable(a4 ${CPP_FILES} ${CPP_HEADERS} ${STB_SRC})
-target_link_libraries(a4 vecmath)
+add_executable(metrocaster ${CPP_FILES} ${CPP_HEADERS} ${STB_SRC})
+target_link_libraries(metrocaster vecmath)
 

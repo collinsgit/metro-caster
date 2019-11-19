@@ -19,6 +19,11 @@ class Renderer
   private:
     Vector3f traceRay(const Ray &ray, float tmin, int bounces, 
                       Hit &hit, float refIndex) const;
+    Vector3f estimatePixel(const Ray &ray, float tmin, int length, int iters);
+    std::vector<Ray> choosePath(const Ray &ray, Light *light, float tmin, int length) const;
+    std::vector<Ray> tracePath(Ray ray, float tmin, int length) const;
+    Vector3f colorPath(std::vector<Ray> path);
+    float probPath(std::vector<Ray> path);
 
     ArgParser _args;
     SceneParser _scene;

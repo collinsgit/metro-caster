@@ -7,6 +7,7 @@
 #include "VecUtils.h"
 
 #include <limits>
+#include <random>
 
 
 Renderer::Renderer(const ArgParser &args) :
@@ -15,11 +16,109 @@ Renderer::Renderer(const ArgParser &args) :
 {
 }
 
-void
-Renderer::Render()
+Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, int length, int iters)
+{
+    Vector3f color;
+
+    // Average over multiple iterations
+    for (int i=0; i<iters; i++) {
+        // 1. Choose a light
+        std::default_random_engine generator;
+        std::uniform_int_distribution<int> uniform(0, _scene.lights.size()-1);
+        Light* light = _scene.lights[uniform(generator)];
+
+        std::vector<Ray> path = choosePath(ray, light, tmin, length);
+        Vector3f path_color = colorPath(path);
+        float path_prob = probPath(path);
+
+        color += path_color / path_prob;
+    }
+
+    return color / (float)iters;
+}
+
+std::vector<Ray> Renderer::tracePath(Ray r,
+        float tmin,
+        int length) const
+{
+    assert(length >= 1);
+
+    std::vector<Ray> path;
+    // Ray r = light->emit();
+    path.push_back(r);
+
+    for (int i=1; i<length; i++) {
+        Hit h;
+        if(_scene.getGroup()->intersect(r, tmin, h)) {
+            Vector3f o = r.pointAtParameter(h.getT());
+
+            // TODO: modify direction to allow for reflection/refraction
+            Vector3f d = r.getDirection() - 2 * Vector3f::dot(r.getDirection(), h.getNormal()) * h.getNormal();
+            d.normalize();
+
+            r = Ray(o, d);
+            path.push_back(r);
+        } else {
+            break;
+        }
+    }
+
+    return path;
+}
+
+std::vector<Ray> Renderer::choosePath(const Ray &r,
+        Light* light,
+        float tmin,
+        int length) const
+{
+    // 2. Draw light path
+    std::vector<Ray> light_path = tracePath(light->emit(), tmin, length);
+
+    // 3. Draw eye path
+    std::vector<Ray> path = tracePath(r, tmin, length);
+
+    // 4. Check for light path obstruction
+    Ray last_eye = path[path.size()-1];
+    Ray last_light = light_path[light_path.size()-1];
+
+    Vector3f dir = last_eye.getOrigin() - last_light.getOrigin();
+    Ray connector = Ray(last_eye.getOrigin(), dir.normalized());
+    Hit connector_hit;
+    _scene.getGroup()->intersect(connector, tmin, connector_hit);
+
+    if (connector_hit.getT() < dir.abs()) {
+        return std::vector<Ray>();
+    }
+
+    // 5. Build Complete Path
+    path[path.size()-1] = connector;
+    for (int i=(int)light_path.size()-1; i>0; i--) {
+        path.emplace_back(light_path[i].getOrigin(),
+                -light_path[i-1].getDirection());
+    }
+
+    return path;
+}
+
+Vector3f colorPath(std::vector<Ray> path)
+{
+    Vector3f color;
+
+    return color;
+}
+
+float probPath(std::vector<Ray> path)
+{
+    float prob;
+
+    return prob;
+}
+
+void Renderer::Render()
 {
     int w = _args.width;
     int h = _args.height;
+    int iters = 10;
 
     Image image(w, h);
     Image nimage(w, h);
@@ -40,35 +139,35 @@ Renderer::Render()
             // You should understand what generateRay() does.
             Ray r = cam->generateRay(Vector2f(ndcx, ndcy));
 
-            Hit h;
-            Vector3f color = traceRay(r, cam->getTMin(), _args.bounces, h, 1.f);
+            Hit hit;
+            Vector3f color = estimatePixel(r, cam->getTMin(), _args.bounces);
+            // Vector3f color = traceRay(r, cam->getTMin(), _args.bounces, hit, 1.f);
 
             image.setPixel(x, y, color);
-            nimage.setPixel(x, y, (h.getNormal() + 1.0f) / 2.0f);
-            float range = (_args.depth_max - _args.depth_min);
-            if (range) {
-                dimage.setPixel(x, y, Vector3f((h.t - _args.depth_min) / range));
-            }
+//            nimage.setPixel(x, y, (hit.getNormal() + 1.0f) / 2.0f);
+//            float range = (_args.depth_max - _args.depth_min);
+//            if (range) {
+//                dimage.setPixel(x, y, Vector3f((hit.t - _args.depth_min) / range));
+//            }
         }
     }
     // END SOLN
 
     // save the files 
-    if (_args.output_file.size()) {
+    if (!_args.output_file.empty()) {
         image.savePNG(_args.output_file);
     }
-    if (_args.depth_file.size()) {
-        dimage.savePNG(_args.depth_file);
-    }
-    if (_args.normals_file.size()) {
-        nimage.savePNG(_args.normals_file);
-    }
+//    if (_args.depth_file.size()) {
+//        dimage.savePNG(_args.depth_file);
+//    }
+//    if (_args.normals_file.size()) {
+//        nimage.savePNG(_args.normals_file);
+//    }
 }
 
 
 
-Vector3f
-Renderer::traceRay(const Ray &r,
+Vector3f Renderer::traceRay(const Ray &r,
     float tmin,
     int bounces,
     Hit &h,
@@ -140,4 +239,3 @@ Renderer::traceRay(const Ray &r,
         return _scene.getBackgroundColor(r.getDirection());
     };
 }
-

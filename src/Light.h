@@ -20,6 +20,8 @@ class Light
                                  Vector3f &tolight, 
                                  Vector3f &intensity, 
                                  float &distToLight) const = 0;
+
+    virtual Ray emit();
 };
 
 class DirectionalLight : public Light
@@ -34,6 +36,8 @@ class DirectionalLight : public Light
         Vector3f &tolight,
         Vector3f &intensity,
         float &distToLight) const override;
+
+    virtual Ray emit();
 
   private:
     Vector3f _direction;
@@ -53,6 +57,8 @@ class PointLight : public Light
         Vector3f &tolight,
         Vector3f &intensity,
         float &distToLight) const override;
+
+    virtual Ray emit();
 
   private:
     Vector3f _position;
