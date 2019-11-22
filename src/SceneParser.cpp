@@ -374,7 +374,7 @@ SceneParser::parseGroup()
             int index = readInt();
             assert(index >= 0 && index <= getNumMaterials());
             _current_material = getMaterial(index);
-            in_light = _current_material->getLight().abs() == 0;
+            in_light = _current_material->getLight() != Vector3f::ZERO;
         } else {
             Object3D *object = parseObject(token);
             assert(object != NULL);

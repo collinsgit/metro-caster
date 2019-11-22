@@ -29,7 +29,6 @@ Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, int length, int ite
         Object3D* light = _scene.lights[uniform(generator)];
 
         std::vector<Ray> path = choosePath(ray, light, tmin, length);
-        //std::cout << "path length " << path.size() << "\n";
 
         Vector3f path_color = colorPath(path, tmin);
         float path_prob = probPath(path);
@@ -46,7 +45,6 @@ std::vector<Ray> Renderer::tracePath(Ray r,
     assert(length >= 1);
 
     std::vector<Ray> path;
-    // Ray r = light->emit();
     path.push_back(r);
 
     for (int i=1; i<length; i++) {
@@ -73,15 +71,17 @@ std::vector<Ray> Renderer::choosePath(const Ray &r,
         float tmin,
         int length) const
 {
+    std::default_random_engine generator(rand());
+    std::poisson_distribution<int> poisson(length);
 
     // TODO: Correct hardcoded lengths
     // 2. Draw light path
-    std::vector<Ray> light_path = tracePath(light->sample(), tmin, 2);
-    //std::cout << "light path length " << light_path.size() << "\n";
+    int light_length = 1 + poisson(generator);
+    std::vector<Ray> light_path = tracePath(light->sample(), tmin, light_length);
 
     // 3. Draw eye path
-    std::vector<Ray> path = tracePath(r, tmin, 3);
-    //std::cout << "eye path length " << path.size() << "\n";
+    int eye_length = 1 + poisson(generator);
+    std::vector<Ray> path = tracePath(r, tmin, eye_length);
 
     // 4. Check for light path obstruction
     Ray last_eye = path[path.size()-1];
@@ -111,13 +111,11 @@ Vector3f Renderer::colorPath(const std::vector<Ray> &path, float tmin)
 {
     Vector3f dirToLight(0);
     Vector3f lightIntensity = _scene.getAmbientLight();
-    //std::cout << "asdf;\n";
+
     for (int i=(int)path.size()-1; i>=0; i--) {
-        //lightIntensity.print();
         Ray r = path[i];
         Hit h;
         if (_scene.getGroup()->intersect(r, tmin, h)) {
-            //lightIntensity.print();
             if (i==path.size()-1) {
                 dirToLight = (r.getDirection() - 2 * Vector3f::dot(r.getDirection(), h.getNormal()) * h.getNormal()).normalized();
             } else {
@@ -144,7 +142,8 @@ void Renderer::Render()
 {
     int w = _args.width;
     int h = _args.height;
-    int iters = 5;
+    int iters = 10;
+    int length = 1;
 
     Image image(w, h);
     Image nimage(w, h);
@@ -168,14 +167,7 @@ void Renderer::Render()
             Ray r = cam->generateRay(Vector2f(ndcx, ndcy));
 
             Hit hit;
-            Vector3f color = estimatePixel(r, 0.01, _args.bounces, iters);
-
-//            if (x == w/2 and y == h/2) {
-//                color = estimatePixel(r, 0.01, _args.bounces, iters);
-//            } else {
-//                color = Vector3f(0.);
-//            }
-            // Vector3f color = traceRay(r, cam->getTMin(), _args.bounces, hit, 1.f);
+            Vector3f color = estimatePixel(r, 0.01, length, iters);
 
             image.setPixel(x, y, color);
 
