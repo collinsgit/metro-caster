@@ -41,7 +41,7 @@ class SceneParser
         return _num_lights;
     }
 
-    Light * getLight(int i) const {
+    Object3D * getLight(int i) const {
         assert(i >= 0 && i < _num_lights);
         return lights[i];
     }
@@ -59,14 +59,14 @@ class SceneParser
         return _group;
     }
 
-   std::vector<Light*> lights;
+   std::vector<Object3D*> lights;
   private:
     void parseFile();
     void parsePerspectiveCamera();
     void parseBackground();
-    void parseLights();
-    Light * parseDirectionalLight();
-    Light * parsePointLight();
+//    void parseLights();
+//    Light * parseDirectionalLight();
+//    Light * parsePointLight();
     void parseMaterials();
     Material * parseMaterial();
 

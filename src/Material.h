@@ -16,12 +16,14 @@ class Material
     Material(const Vector3f &diffuseColor, 
              const Vector3f &specularColor = Vector3f::ZERO,
              const Vector3f &transColor = Vector3f::ZERO,
+             const Vector3f &light = Vector3f::ZERO,
              float shininess = 0,
              float refIndex = 0
              ) :
         _diffuseColor(diffuseColor),
         _specularColor(specularColor),
         _shininess(shininess),
+        _light(light),
         _transColor(transColor),
         _refIndex(refIndex)
     { }
@@ -38,6 +40,10 @@ class Material
         return _transColor;
     }
 
+    const Vector3f & getLight() const {
+        return _light;
+    }
+
     float getRefIndex() const {
         return _refIndex;
     }
@@ -51,6 +57,7 @@ protected:
     Vector3f _diffuseColor;
     Vector3f _specularColor;
     Vector3f _transColor;
+    Vector3f _light;
     float   _shininess;
     float _refIndex;
 };

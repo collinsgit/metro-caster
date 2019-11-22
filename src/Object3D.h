@@ -30,6 +30,10 @@ public:
 
     virtual bool intersect(const Ray &r, float tmin, Hit &h) const = 0;
 
+    virtual Ray sample() {
+        return Ray(Vector3f(0), Vector3f(0));
+    }
+
     std::string   type;
     Material*     material;
 };
@@ -54,6 +58,8 @@ public:
     }
 
     virtual bool intersect(const Ray &r, float tmin, Hit &h) const override;
+
+    virtual Ray sample() override;
 
 private:
     Vector3f _center;

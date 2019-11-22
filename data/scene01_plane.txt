@@ -6,22 +6,13 @@ PerspectiveCamera {
     angle 30
 }
 
-Lights {
-    numLights 1
-    PointLight {
-        position 0.0 5 5
-        color 0.9 0.9 0.9 
-        falloff 0.025
-    }
-}
-
 Background {
     color 0 0 0 
-    ambientLight 0.1 0.1 0.1 
+    ambientLight 0.2 0.2 0.2
 }
 
 Materials {
-    numMaterials 4
+    numMaterials 5
     Material { diffuseColor 1 0 0 
       specularColor 1 1 1
       shininess 20
@@ -31,10 +22,12 @@ Materials {
     Material { diffuseColor 1 1 1 
 	specularColor 1 1 1
 	shininess 20}
+	Material { diffuseColor 1 1 1
+	light 0.8 0.8 0.8}
 }
 
 Group {
-    numObjects 6
+    numObjects 7
     MaterialIndex 0
     Sphere {
 	center 0 0 0 
@@ -62,6 +55,12 @@ Group {
     Plane {
 	normal 0 1 0
         offset -2 
+    }
+
+    MaterialIndex 4
+    Sphere {
+    center 0.0 5 5
+        radius 0.1
     }
 }
 

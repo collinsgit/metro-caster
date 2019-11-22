@@ -4,8 +4,6 @@ Vector3f Material::shade(const Ray &ray,
     const Vector3f &dirToLight,
     const Vector3f &lightIntensity)
 {
-    // TODO implement Diffuse and Specular phong terms
-
     // diffuse
     Vector3f surfNormal = hit.getNormal();
     float diffuseClamp = Vector3f::dot(dirToLight, surfNormal);
@@ -21,5 +19,5 @@ Vector3f Material::shade(const Ray &ray,
 
     Vector3f specularLight = pow(specularClamp, _shininess) * lightIntensity * _specularColor;
 
-    return diffuseLight + specularLight;
+    return diffuseLight + specularLight + _light;
 }

@@ -1,6 +1,8 @@
 #include "Object3D.h"
 #include "VecUtils.h"
 #include "quartic.cpp"
+#include <cmath>
+#include <random>
 
 bool Sphere::intersect(const Ray &r, float tmin, Hit &h) const
 {
@@ -53,6 +55,21 @@ bool Sphere::intersect(const Ray &r, float tmin, Hit &h) const
     }
     // END STARTER
     return false;
+}
+
+Ray Sphere::sample() {
+    std::default_random_engine generator(rand());
+    std::uniform_real_distribution<float> theta_dist(0., 2*M_PI);
+    std::uniform_real_distribution<float> cosphi_dist(-1., 1.);
+
+    float theta = theta_dist(generator);
+    float cosphi = cosphi_dist(generator);
+
+    Vector3f dir((1 - cosphi*cosphi)*cos(theta),
+                 (1 - cosphi*cosphi)*sin(theta),
+                 cosphi);
+
+    return Ray{_radius * dir + _center, dir};
 }
 
 // Add object to group
