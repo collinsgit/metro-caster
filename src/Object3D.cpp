@@ -9,22 +9,17 @@
 #endif
 
 bool Sphere::intersect(const Ray &r, float tmin, Hit &h) const {
-    // BEGIN STARTER
-
-    // We provide sphere intersection code for you.
-    // You should model other intersection implementations after this one.
-
     // Locate intersection point ( 2 pts )
-    const Vector3f &rayOrigin = r.getOrigin(); //Ray origin in the world coordinate
+    const Vector3f &rayOrigin = r.getOrigin();
     const Vector3f &dir = r.getDirection();
 
-    Vector3f origin = rayOrigin - _center;      //Ray origin in the sphere coordinate
+    Vector3f origin = rayOrigin - _center;
 
     float a = dir.absSquared();
     float b = 2 * Vector3f::dot(dir, origin);
     float c = origin.absSquared() - _radius * _radius;
 
-    // no intersection
+    // No intersection case.
     if (b * b - 4 * a * c < 0) {
         return false;
     }
@@ -34,18 +29,18 @@ bool Sphere::intersect(const Ray &r, float tmin, Hit &h) const {
     float tplus = (-b + d) / (2.0f * a);
     float tminus = (-b - d) / (2.0f * a);
 
-    // the two intersections are at the camera back
+    // The two intersections are at the camera back.
     if ((tplus < tmin) && (tminus < tmin)) {
         return false;
     }
 
+    // The two intersections are at the camera front.
     float t = 10000;
-    // the two intersections are at the camera front
     if (tminus > tmin) {
         t = tminus;
     }
 
-    // one intersection at the front. one at the back 
+    // One intersection at the front. one at the back.
     if ((tplus > tmin) && (tminus < tmin)) {
         t = tplus;
     }
@@ -86,8 +81,6 @@ int Group::getGroupSize() const {
 }
 
 bool Group::intersect(const Ray &r, float tmin, Hit &h) const {
-    // BEGIN STARTER
-    // we implemented this for you
     bool hit = false;
     for (Object3D *o : m_members) {
         if (o->intersect(r, tmin, h)) {
@@ -100,7 +93,6 @@ bool Group::intersect(const Ray &r, float tmin, Hit &h) const {
 
 
 bool Plane::intersect(const Ray &r, float tmin, Hit &h) const {
-    // t = (d - r_0 . n) / (r_d . n)
     float t = (_d - Vector3f::dot(r.getOrigin(), _normal)) / Vector3f::dot(r.getDirection(), _normal);
 
     if ((t > tmin) && (t < h.getT())) {
@@ -176,11 +168,6 @@ bool Torus::intersect(const Ray &r, float tmin, Hit &h) const {
     // check that it is the closest hit so far
     if (t_min < h.getT()) {
         Vector3f point = r.pointAtParameter(t_min);
-
-        // sanity check
-//        if (point.abs() > _R + _r) {
-//            return false;
-//        }
 
         float alpha = _R / point.xz().abs();
         Vector3f normal((1 - alpha) * point[0], point[1], (1 - alpha) * point[2]);

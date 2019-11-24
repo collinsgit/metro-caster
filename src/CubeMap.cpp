@@ -2,7 +2,6 @@
 
 #include <cmath>
 #include <string>
-#include <iostream>
 
 CubeMap::CubeMap(const std::string &directory) {
     std::string side[6] = {"left", "right", "up", "down", "front", "back"};

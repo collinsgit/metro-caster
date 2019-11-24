@@ -10,7 +10,7 @@
 
 class Light {
 public:
-    virtual ~Light() {}
+    virtual ~Light() = default;
 
     // in:  p           is the point to be shaded
     // out: tolight     is direction from p to light source
@@ -30,12 +30,12 @@ public:
             _direction(d.normalized()),
             _color(c) {}
 
-    virtual void getIllumination(const Vector3f &p,
+    void getIllumination(const Vector3f &p,
                                  Vector3f &tolight,
                                  Vector3f &intensity,
                                  float &distToLight) const override;
 
-    virtual Ray emit() const override;
+    Ray emit() const override;
 
 private:
     Vector3f _direction;
@@ -49,12 +49,12 @@ public:
             _color(c),
             _falloff(falloff) {}
 
-    virtual void getIllumination(const Vector3f &p,
+    void getIllumination(const Vector3f &p,
                                  Vector3f &tolight,
                                  Vector3f &intensity,
                                  float &distToLight) const override;
 
-    virtual Ray emit() const override;
+    Ray emit() const override;
 
 private:
     Vector3f _position;

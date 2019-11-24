@@ -4,12 +4,12 @@
 #include "Ray.h"
 
 #include <vecmath.h>
-#include <float.h>
+#include <cfloat>
 #include <cmath>
 
 class Camera {
 public:
-    virtual ~Camera() {}
+    virtual ~Camera() = default;
 
     // Generate rays for each screen-space coordinate
     virtual Ray generateRay(const Vector2f &point) = 0;
@@ -17,7 +17,6 @@ public:
     virtual float getTMin() const = 0;
 };
 
-/// Fill in functions and add more fields if necessary
 class PerspectiveCamera : public Camera {
 public:
     PerspectiveCamera(const Vector3f &center,
@@ -31,7 +30,7 @@ public:
         _horizontal = Vector3f::cross(direction, up).normalized();
     }
 
-    virtual Ray generateRay(const Vector2f &point) override {
+    Ray generateRay(const Vector2f &point) override {
         // BEGIN STARTER
         float d = 1.0f / (float) std::tan(_angle / 2.0f);
         Vector3f newDir = d * _direction + point[0] * _horizontal + point[1] * _up;
@@ -41,7 +40,7 @@ public:
         // END STARTER
     }
 
-    virtual float getTMin() const override {
+    float getTMin() const override {
         return 0.0f;
     }
 

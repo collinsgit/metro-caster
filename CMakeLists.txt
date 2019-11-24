@@ -24,7 +24,6 @@ set(CPP_FILES
     ${SRC_DIR}main.cpp
     ${SRC_DIR}stb.cpp
     ${SRC_DIR}ArgParser.cpp
-    ${SRC_DIR}Camera.cpp
     ${SRC_DIR}CubeMap.cpp
     ${SRC_DIR}Image.cpp
     ${SRC_DIR}Light.cpp

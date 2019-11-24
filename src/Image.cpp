@@ -1,5 +1,3 @@
-#include <cstdlib>
-#include <cstdio>
 #include <cstring>
 #include <cassert>
 
@@ -50,7 +48,7 @@ Image::loadPNG(const std::string &filename) {
 
     int w, h, n;
     unsigned char *buffer = stbi_load(filename.c_str(), &w, &h, &n, 0);
-    assert(buffer != NULL);
+    assert(buffer != nullptr);
     assert(n == 3);
 
     Image image(w, h);
