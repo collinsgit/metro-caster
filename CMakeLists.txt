@@ -34,7 +34,6 @@ set(CPP_FILES
     ${SRC_DIR}Octree.cpp
     ${SRC_DIR}Renderer.cpp
     ${SRC_DIR}SceneParser.cpp
-    ${SRC_DIR}VecUtils.cpp
     )
 
 set(CPP_HEADERS

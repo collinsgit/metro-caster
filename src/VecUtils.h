@@ -50,7 +50,7 @@ public:
     }
 
     // Transforms a 3D direction using a matrix, returning a direction.
-    // This function *does not* take the inverse tranpose for you.
+    // This function *does not* take the inverse transpose for you.
     static Vector3f transformDirection(const Matrix4f &mat,
                                        const Vector3f &dir) {
         return (mat * Vector4f(dir, 0)).xyz();
