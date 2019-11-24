@@ -31,6 +31,9 @@ public:
     bool jitter;
     bool filter;
 
+    // logging
+    std::string log_file;
+
 private:
     void defaultValues();
 };

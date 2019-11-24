@@ -59,7 +59,17 @@ ArgParser::ArgParser(int argc, const char *argv[]) {
             jitter = true;
         } else if (strcmp(argv[i], "-filter") == 0) {
             filter = true;
-        } else {
+        }
+
+        // logging
+        else if (!strcmp(argv[i], "-log")) {
+            i++;
+            assert (i < argc);
+            log_file = argv[i];
+        }
+
+        // Unknown argument.
+        else {
             printf("Unknown command line argument %d: '%s'\n", i, argv[i]);
             exit(1);
         }
@@ -77,6 +87,7 @@ ArgParser::ArgParser(int argc, const char *argv[]) {
     std::cout << "- bounces: " << bounces << std::endl;
     std::cout << "- shadows: " << shadows << std::endl;
     std::cout << "- refractions: " << refraction << std::endl;
+    std::cout << "- log: " << log_file << std::endl;
 }
 
 void
@@ -100,4 +111,7 @@ ArgParser::defaultValues() {
     // sampling
     jitter = false;
     filter = false;
+
+    // logging
+    log_file = "";
 }
