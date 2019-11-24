@@ -21,6 +21,8 @@ public:
     // rendering options
     float depth_min;
     float depth_max;
+    int iters;
+    float length;
     int bounces;
     bool shadows;
     bool refraction;

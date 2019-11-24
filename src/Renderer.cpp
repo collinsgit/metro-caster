@@ -65,11 +65,10 @@ std::vector<Ray> Renderer::tracePath(Ray r,
 std::vector<Ray> Renderer::choosePath(const Ray &r,
                                       Object3D *light,
                                       float tmin,
-                                      int length) const {
+                                      float length) const {
     std::default_random_engine generator(rand());
     std::poisson_distribution<int> poisson(length);
 
-    // TODO: Correct hardcoded lengths
     // 2. Draw light path
     int light_length = 1 + poisson(generator);
     std::vector<Ray> light_path = tracePath(light->sample(), tmin, light_length);
@@ -133,28 +132,22 @@ float Renderer::probPath(const std::vector<Ray> &path) {
 }
 
 void Renderer::Render() {
+    // Loop through all the pixels in the image
+    // generate all the samples. Fetch necessary args.
     int w = _args.width;
     int h = _args.height;
-    int iters = 10;
-    int length = 1;
-
-    Image image(w, h);
-    Image nimage(w, h);
-    Image dimage(w, h);
-
-    // loop through all the pixels in the image
-    // generate all the samples
+    int iters = _args.iters;
+    float length = _args.length;
 
     // This look generates camera rays and calls traceRay.
-    // It also write to the color, normal, and depth images.
-    // You should understand what this code does.
+    // It also write to the color image.
+    Image image(w, h);
     Camera *cam = _scene.getCamera();
     for (int y = 0; y < h; ++y) {
         float ndcy = 2 * (y / (h - 1.0f)) - 1.0f;
         for (int x = 0; x < w; ++x) {
             float ndcx = 2 * (x / (w - 1.0f)) - 1.0f;
             // Use PerspectiveCamera to generate a ray.
-            // You should understand what generateRay() does.
             Ray r = cam->generateRay(Vector2f(ndcx, ndcy));
 
             Hit hit;
@@ -163,9 +156,8 @@ void Renderer::Render() {
             image.setPixel(x, y, color);
         }
     }
-    // END SOLN
 
-    // save the files 
+    // Save the output file.
     if (!_args.output_file.empty()) {
         image.savePNG(_args.output_file);
     }
