@@ -5,11 +5,10 @@
 #include <random>
 
 #ifndef M_PI
-    #define M_PI 3.14159265358979323846
+#define M_PI 3.14159265358979323846
 #endif
 
-bool Sphere::intersect(const Ray &r, float tmin, Hit &h) const
-{
+bool Sphere::intersect(const Ray &r, float tmin, Hit &h) const {
     // BEGIN STARTER
 
     // We provide sphere intersection code for you.
@@ -32,8 +31,8 @@ bool Sphere::intersect(const Ray &r, float tmin, Hit &h) const
 
     float d = sqrt(b * b - 4 * a * c);
 
-    float tplus = (-b + d) / (2.0f*a);
-    float tminus = (-b - d) / (2.0f*a);
+    float tplus = (-b + d) / (2.0f * a);
+    float tminus = (-b - d) / (2.0f * a);
 
     // the two intersections are at the camera back
     if ((tplus < tmin) && (tminus < tmin)) {
@@ -63,14 +62,14 @@ bool Sphere::intersect(const Ray &r, float tmin, Hit &h) const
 
 Ray Sphere::sample() {
     std::default_random_engine generator(rand());
-    std::uniform_real_distribution<float> theta_dist(0., 2*M_PI);
+    std::uniform_real_distribution<float> theta_dist(0., 2 * M_PI);
     std::uniform_real_distribution<float> cosphi_dist(-1., 1.);
 
     float theta = theta_dist(generator);
     float cosphi = cosphi_dist(generator);
 
-    Vector3f dir((1 - cosphi*cosphi)*cos(theta),
-                 (1 - cosphi*cosphi)*sin(theta),
+    Vector3f dir((1 - cosphi * cosphi) * cos(theta),
+                 (1 - cosphi * cosphi) * sin(theta),
                  cosphi);
 
     return Ray{_radius * dir + _center, dir};
@@ -83,15 +82,14 @@ void Group::addObject(Object3D *obj) {
 
 // Return number of objects in group
 int Group::getGroupSize() const {
-    return (int)m_members.size();
+    return (int) m_members.size();
 }
 
-bool Group::intersect(const Ray &r, float tmin, Hit &h) const
-{
+bool Group::intersect(const Ray &r, float tmin, Hit &h) const {
     // BEGIN STARTER
     // we implemented this for you
     bool hit = false;
-    for (Object3D* o : m_members) {
+    for (Object3D *o : m_members) {
         if (o->intersect(r, tmin, h)) {
             hit = true;
         }
@@ -101,8 +99,7 @@ bool Group::intersect(const Ray &r, float tmin, Hit &h) const
 }
 
 
-bool Plane::intersect(const Ray &r, float tmin, Hit &h) const
-{
+bool Plane::intersect(const Ray &r, float tmin, Hit &h) const {
     // t = (d - r_0 . n) / (r_d . n)
     float t = (_d - Vector3f::dot(r.getOrigin(), _normal)) / Vector3f::dot(r.getDirection(), _normal);
 
@@ -114,8 +111,7 @@ bool Plane::intersect(const Ray &r, float tmin, Hit &h) const
     return false;
 }
 
-bool Triangle::intersect(const Ray &r, float tmin, Hit &h) const 
-{
+bool Triangle::intersect(const Ray &r, float tmin, Hit &h) const {
     Matrix3f A(_v[0] - _v[1], _v[0] - _v[2], r.getDirection(), true);
     Vector3f b = _v[0] - r.getOrigin();
     Vector3f x = A.inverse() * b;
@@ -134,8 +130,7 @@ bool Triangle::intersect(const Ray &r, float tmin, Hit &h) const
 }
 
 
-bool Torus::intersect(const Ray &r, float tmin, Hit &h) const
-{
+bool Torus::intersect(const Ray &r, float tmin, Hit &h) const {
     // method adapted from https://github.com/sasamil/Quartic
     // and http://www.cosinekitty.com/raytrace/chapter13_torus.html
     Vector3f ray_dir = r.getDirection();
@@ -157,25 +152,25 @@ bool Torus::intersect(const Ray &r, float tmin, Hit &h) const
     c /= z;
     d /= z;
 
-    std::complex<double>* solutions = solve_quartic(a, b, c, d);
+    std::complex<double> *solutions = solve_quartic(a, b, c, d);
 
     // find closest solution
     std::complex<double> solution;
     float t_min = h.getT();
     float t_guess;
     float imag_eps = 0.;
-    for (int i=0; i < 4; i++) {
-         solution = solutions[i];
+    for (int i = 0; i < 4; i++) {
+        solution = solutions[i];
 
-         if (abs(solution.imag()) > imag_eps) {
-             continue;
-         }
+        if (abs(solution.imag()) > imag_eps) {
+            continue;
+        }
 
-         t_guess = (float)solution.real();
+        t_guess = (float) solution.real();
 
-         if ((t_guess < t_min) && (t_guess > tmin)) {
-             t_min = t_guess;
-         }
+        if ((t_guess < t_min) && (t_guess > tmin)) {
+            t_min = t_guess;
+        }
     }
 
     // check that it is the closest hit so far
@@ -188,7 +183,7 @@ bool Torus::intersect(const Ray &r, float tmin, Hit &h) const
 //        }
 
         float alpha = _R / point.xz().abs();
-        Vector3f normal((1-alpha) * point[0], point[1], (1 - alpha) * point[2]);
+        Vector3f normal((1 - alpha) * point[0], point[1], (1 - alpha) * point[2]);
         normal.normalize();
 
         h.set(t_min, this->material, normal);
@@ -199,11 +194,10 @@ bool Torus::intersect(const Ray &r, float tmin, Hit &h) const
 }
 
 
-bool Transform::intersect(const Ray &r, float tmin, Hit &h) const
-{
+bool Transform::intersect(const Ray &r, float tmin, Hit &h) const {
     Matrix4f m_inverse = _m.inverse();
     Ray new_r(VecUtils::transformPoint(m_inverse, r.getOrigin()),
-            VecUtils::transformDirection(m_inverse, r.getDirection()));
+              VecUtils::transformDirection(m_inverse, r.getDirection()));
     bool hit = _object->intersect(new_r, tmin, h);
 
     if (hit) {

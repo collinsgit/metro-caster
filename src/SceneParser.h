@@ -15,13 +15,13 @@
 
 #define MAX_PARSER_TOKEN_LENGTH 100
 
-class SceneParser
-{
-  public:
+class SceneParser {
+public:
     SceneParser(const std::string &filename);
+
     ~SceneParser();
 
-    Camera * getCamera() const {
+    Camera *getCamera() const {
         return _camera;
     }
 
@@ -33,7 +33,7 @@ class SceneParser
         }
     }
 
-    const Vector3f & getAmbientLight() const {
+    const Vector3f &getAmbientLight() const {
         return _ambient_light;
     }
 
@@ -41,7 +41,7 @@ class SceneParser
         return _num_lights;
     }
 
-    Object3D * getLight(int i) const {
+    Object3D *getLight(int i) const {
         assert(i >= 0 && i < _num_lights);
         return lights[i];
     }
@@ -50,54 +50,70 @@ class SceneParser
         return _num_materials;
     }
 
-    Material * getMaterial(int i) const {
+    Material *getMaterial(int i) const {
         assert(i >= 0 && i < _num_materials);
         return _materials[i];
     }
 
-    Group * getGroup() const {
+    Group *getGroup() const {
         return _group;
     }
 
-   std::vector<Object3D*> lights;
-  private:
+    std::vector<Object3D *> lights;
+private:
     void parseFile();
-    void parsePerspectiveCamera();
-    void parseBackground();
-//    void parseLights();
-//    Light * parseDirectionalLight();
-//    Light * parsePointLight();
-    void parseMaterials();
-    Material * parseMaterial();
 
-    Object3D * parseObject(char token[MAX_PARSER_TOKEN_LENGTH]);
-    Group * parseGroup();
-    Sphere * parseSphere();
-    Torus * parseTorus();
-    Plane * parsePlane();
-    Triangle * parseTriangle();
-    Mesh * parseTriangleMesh();
-    Transform * parseTransform();
-    CubeMap * parseCubeMap();
+    void parsePerspectiveCamera();
+
+    void parseBackground();
+
+    // void parseLights();
+    // Light * parseDirectionalLight();
+    // Light * parsePointLight();
+    void parseMaterials();
+
+    Material *parseMaterial();
+
+    Object3D *parseObject(char token[MAX_PARSER_TOKEN_LENGTH]);
+
+    Group *parseGroup();
+
+    Sphere *parseSphere();
+
+    Torus *parseTorus();
+
+    Plane *parsePlane();
+
+    Triangle *parseTriangle();
+
+    Mesh *parseTriangleMesh();
+
+    Transform *parseTransform();
+
+    CubeMap *parseCubeMap();
 
     int getToken(char token[MAX_PARSER_TOKEN_LENGTH]);
+
     Vector3f readVector3f();
+
     Vector2f readVec2f();
+
     float readFloat();
+
     int readInt();
 
     std::string _basepath;
-    FILE * _file;
-    Camera * _camera;
+    FILE *_file;
+    Camera *_camera;
     Vector3f _background_color;
     Vector3f _ambient_light;
     int _num_lights;
     int _num_materials;
-    std::vector<Material*> _materials;
-    std::vector<Object3D*> _objects;
-    Material * _current_material;
-    Group * _group;
-    CubeMap * _cubemap;
+    std::vector<Material *> _materials;
+    std::vector<Object3D *> _objects;
+    Material *_current_material;
+    Group *_group;
+    CubeMap *_cubemap;
 };
 
 #endif // SCENE_PARSER_H

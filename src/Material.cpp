@@ -1,9 +1,9 @@
 #include "Material.h"
+
 Vector3f Material::shade(const Ray &ray,
-    const Hit &hit,
-    const Vector3f &dirToLight,
-    const Vector3f &lightIntensity)
-{
+                         const Hit &hit,
+                         const Vector3f &dirToLight,
+                         const Vector3f &lightIntensity) {
     // diffuse
     Vector3f surfNormal = hit.getNormal();
     float diffuseClamp = Vector3f::dot(dirToLight, surfNormal);

@@ -34,20 +34,17 @@ private:
 
     template<typename T>
     static T
-        clamp(const T &v, const T &lower_range, const T &upper_range)
-    {
+    clamp(const T &v, const T &lower_range, const T &upper_range) {
         if (v < lower_range) {
             return lower_range;
-        }
-        else if (v > upper_range) {
+        } else if (v > upper_range) {
             return upper_range;
-        }
-        else {
+        } else {
             return v;
         }
     }
 
-    const Vector3f & getTexturePixel(int x, int y, int face) const {
+    const Vector3f &getTexturePixel(int x, int y, int face) const {
         x = clamp(x, 0, _images[face].getWidth() - 1);
         y = clamp(y, 0, _images[face].getHeight() - 1);
         return _images[face].getPixel(x, y);

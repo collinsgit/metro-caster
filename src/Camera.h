@@ -7,36 +7,33 @@
 #include <float.h>
 #include <cmath>
 
-class Camera
-{
+class Camera {
 public:
     virtual ~Camera() {}
 
     // Generate rays for each screen-space coordinate
     virtual Ray generateRay(const Vector2f &point) = 0;
+
     virtual float getTMin() const = 0;
 };
 
 /// Fill in functions and add more fields if necessary
-class PerspectiveCamera : public Camera
-{
+class PerspectiveCamera : public Camera {
 public:
     PerspectiveCamera(const Vector3f &center,
-        const Vector3f &direction,
-        const Vector3f &up,
-        float angleradians) :
-        _center(center),
-        _direction(direction.normalized()),
-        _up(up),
-        _angle(angleradians)
-    {
+                      const Vector3f &direction,
+                      const Vector3f &up,
+                      float angleradians) :
+            _center(center),
+            _direction(direction.normalized()),
+            _up(up),
+            _angle(angleradians) {
         _horizontal = Vector3f::cross(direction, up).normalized();
     }
 
-    virtual Ray generateRay(const Vector2f &point) override
-    {
+    virtual Ray generateRay(const Vector2f &point) override {
         // BEGIN STARTER
-        float d = 1.0f / (float)std::tan(_angle / 2.0f);
+        float d = 1.0f / (float) std::tan(_angle / 2.0f);
         Vector3f newDir = d * _direction + point[0] * _horizontal + point[1] * _up;
         newDir = newDir.normalized();
 
@@ -44,8 +41,7 @@ public:
         // END STARTER
     }
 
-    virtual float getTMin() const override
-    {
+    virtual float getTMin() const override {
         return 0.0f;
     }
 

@@ -11,22 +11,20 @@
 
 
 Renderer::Renderer(const ArgParser &args) :
-    _args(args),
-    _scene(args.input_file)
-{
+        _args(args),
+        _scene(args.input_file) {
 }
 
-Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, int length, int iters)
-{
+Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, int length, int iters) {
     Vector3f color;
 
     // Average over multiple iterations
-    for (int i=0; i<iters; i++) {
+    for (int i = 0; i < iters; i++) {
 
         // 1. Choose a light
         std::default_random_engine generator;
-        std::uniform_int_distribution<int> uniform(0, _scene.lights.size()-1);
-        Object3D* light = _scene.lights[uniform(generator)];
+        std::uniform_int_distribution<int> uniform(0, _scene.lights.size() - 1);
+        Object3D *light = _scene.lights[uniform(generator)];
 
         std::vector<Ray> path = choosePath(ray, light, tmin, length);
 
@@ -35,21 +33,20 @@ Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, int length, int ite
         color += path_color / path_prob;
     }
 
-    return color / (float)iters;
+    return color / (float) iters;
 }
 
 std::vector<Ray> Renderer::tracePath(Ray r,
-        float tmin,
-        int length) const
-{
+                                     float tmin,
+                                     int length) const {
     assert(length >= 1);
 
     std::vector<Ray> path;
     path.push_back(r);
 
-    for (int i=1; i<length; i++) {
+    for (int i = 1; i < length; i++) {
         Hit h;
-        if(_scene.getGroup()->intersect(r, tmin, h)) {
+        if (_scene.getGroup()->intersect(r, tmin, h)) {
             Vector3f o = r.pointAtParameter(h.getT());
 
             // TODO: modify direction to allow for reflection/refraction
@@ -67,10 +64,9 @@ std::vector<Ray> Renderer::tracePath(Ray r,
 }
 
 std::vector<Ray> Renderer::choosePath(const Ray &r,
-        Object3D* light,
-        float tmin,
-        int length) const
-{
+                                      Object3D *light,
+                                      float tmin,
+                                      int length) const {
     std::default_random_engine generator(rand());
     std::poisson_distribution<int> poisson(length);
 
@@ -84,8 +80,8 @@ std::vector<Ray> Renderer::choosePath(const Ray &r,
     std::vector<Ray> path = tracePath(r, tmin, eye_length);
 
     // 4. Check for light path obstruction
-    Ray last_eye = path[path.size()-1];
-    Ray last_light = light_path[light_path.size()-1];
+    Ray last_eye = path[path.size() - 1];
+    Ray last_light = light_path[light_path.size() - 1];
 
     Vector3f dir = last_light.getOrigin() - last_eye.getOrigin();
     Ray connector = Ray(last_eye.getOrigin(), dir.normalized());
@@ -98,28 +94,28 @@ std::vector<Ray> Renderer::choosePath(const Ray &r,
     }
 
     // 5. Build Complete Path
-    path[path.size()-1] = connector;
-    for (int i=(int)light_path.size()-1; i>0; i--) {
+    path[path.size() - 1] = connector;
+    for (int i = (int) light_path.size() - 1; i > 0; i--) {
         path.emplace_back(light_path[i].getOrigin(),
-                -light_path[i-1].getDirection());
+                          -light_path[i - 1].getDirection());
     }
 
     return path;
 }
 
-Vector3f Renderer::colorPath(const std::vector<Ray> &path, float tmin)
-{
+Vector3f Renderer::colorPath(const std::vector<Ray> &path, float tmin) {
     Vector3f dirToLight(0);
     Vector3f lightIntensity = _scene.getAmbientLight();
 
-    for (int i=(int)path.size()-1; i>=0; i--) {
+    for (int i = (int) path.size() - 1; i >= 0; i--) {
         Ray r = path[i];
         Hit h;
         if (_scene.getGroup()->intersect(r, tmin, h)) {
-            if (i==path.size()-1) {
-                dirToLight = (r.getDirection() - 2 * Vector3f::dot(r.getDirection(), h.getNormal()) * h.getNormal()).normalized();
+            if (i == path.size() - 1) {
+                dirToLight = (r.getDirection() -
+                              2 * Vector3f::dot(r.getDirection(), h.getNormal()) * h.getNormal()).normalized();
             } else {
-                dirToLight = path[i+1].getDirection();
+                dirToLight = path[i + 1].getDirection();
             }
 
             lightIntensity = h.getMaterial()->shade(r, h, dirToLight, lightIntensity);
@@ -131,15 +127,13 @@ Vector3f Renderer::colorPath(const std::vector<Ray> &path, float tmin)
     return lightIntensity;
 }
 
-float Renderer::probPath(const std::vector<Ray> &path)
-{
+float Renderer::probPath(const std::vector<Ray> &path) {
     float prob = 1; // 1. / (4 * M_PI);
 
     return prob;
 }
 
-void Renderer::Render()
-{
+void Renderer::Render() {
     int w = _args.width;
     int h = _args.height;
     int iters = 10;
@@ -157,7 +151,7 @@ void Renderer::Render()
     // This look generates camera rays and calls traceRay.
     // It also write to the color, normal, and depth images.
     // You should understand what this code does.
-    Camera* cam = _scene.getCamera();
+    Camera *cam = _scene.getCamera();
     for (int y = 0; y < h; ++y) {
         float ndcy = 2 * (y / (h - 1.0f)) - 1.0f;
         for (int x = 0; x < w; ++x) {

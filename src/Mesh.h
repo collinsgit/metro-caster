@@ -10,18 +10,18 @@
 #include <vector>
 
 class Mesh : public Object3D {
-  public:
+public:
     Mesh(const std::string &filename, Material *m);
 
     virtual bool intersect(const Ray &r, float tmin, Hit &h) const;
 
     virtual bool intersectTrig(int idx, const Ray &r) const;
 
-    const std::vector<Triangle> & getTriangles() const {
+    const std::vector<Triangle> &getTriangles() const {
         return _triangles;
     }
 
-  private:
+private:
     std::vector<Triangle> _triangles;
     mutable Octree octree;
     mutable const Ray *ray;

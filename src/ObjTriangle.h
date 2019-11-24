@@ -6,12 +6,11 @@
 // By default counterclockwise winding is front face
 struct ObjTriangle {
     ObjTriangle() :
-        x{ { 0, 0, 0 } },
-        texID{ { 0, 0, 0 } }
-    {
+            x{{0, 0, 0}},
+            texID{{0, 0, 0}} {
     }
 
-    int & operator[](int i) {
+    int &operator[](int i) {
         return x[i];
     }
 

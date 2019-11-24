@@ -8,14 +8,13 @@
 #include "vecmath.h"
 
 // Simple image class
-class Image
-{
+class Image {
 public:
     Image() : _width(0), _height(0) {}
+
     // Instantiate an image of given width and height
     // All pixels are set to black (0, 0, 0) by default.
-    Image(int w, int h)
-    {
+    Image(int w, int h) {
         _width = w;
         _height = h;
         _data.resize(_width * _height);
@@ -39,7 +38,7 @@ public:
     }
 
     // Return pixel at given x, y coordinates
-    const Vector3f & getPixel(int x, int y) const {
+    const Vector3f &getPixel(int x, int y) const {
         assert(x >= 0 && x < _width);
         assert(y >= 0 && y < _height);
         return _data[y * _width + x];
@@ -59,7 +58,7 @@ public:
     void savePNG(const std::string &filename) const;
 
     // Return an absolute difference betweenthe given images
-    static Image compare(const Image & img1, const Image & img2);
+    static Image compare(const Image &img1, const Image &img2);
 
 private:
     int _width;

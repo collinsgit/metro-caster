@@ -10,8 +10,7 @@
 
 static
 uint8_t
-clampColorComponent(float c)
-{
+clampColorComponent(float c) {
     int tmp = int(c * 255);
 
     if (tmp < 0) {
@@ -26,8 +25,7 @@ clampColorComponent(float c)
 }
 
 void
-Image::savePNG(const std::string &filename) const
-{
+Image::savePNG(const std::string &filename) const {
     assert(!filename.empty());
 
     std::vector<uint8_t> buffer;
@@ -46,9 +44,8 @@ Image::savePNG(const std::string &filename) const
     stbi_write_png(filename.c_str(), _width, _height, 3, &buffer[0], _width * 3);
 }
 
-Image 
-Image::loadPNG(const std::string &filename) 
-{
+Image
+Image::loadPNG(const std::string &filename) {
     assert(!filename.empty());
 
     int w, h, n;
@@ -73,8 +70,7 @@ Image::loadPNG(const std::string &filename)
 }
 
 Image
-Image::compare(const Image& img1, const Image & img2) 
-{
+Image::compare(const Image &img1, const Image &img2) {
     assert(img1.getWidth() == img2.getWidth());
     assert(img1.getHeight() == img2.getHeight());
 
@@ -87,9 +83,9 @@ Image::compare(const Image& img1, const Image & img2)
             const Vector3f &color1 = img1.getPixel(x, y);
             const Vector3f &color2 = img2.getPixel(x, y);
             Vector3f color3 =
-                Vector3f(fabs(color1[0] - color2[0]),
-                         fabs(color1[1] - color2[1]),
-                         fabs(color1[2] - color2[2]));
+                    Vector3f(fabs(color1[0] - color2[0]),
+                             fabs(color1[1] - color2[1]),
+                             fabs(color1[2] - color2[2]));
             diff.setPixel(x, y, color3);
         }
     }
