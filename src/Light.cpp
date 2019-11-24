@@ -4,55 +4,58 @@
 #include <random>
 #include <cmath>
 
-    void DirectionalLight::getIllumination(const Vector3f &p, 
-                                 Vector3f &tolight, 
-                                 Vector3f &intensity, 
-                                 float &distToLight) const
-    {
-        // the direction to the light is the opposite of the
-        // direction of the directional light source
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
 
-        // BEGIN STARTER
-        tolight = -_direction;
-        intensity  = _color;
-        distToLight = std::numeric_limits<float>::max();
-        // END STARTER
-    }
+void DirectionalLight::getIllumination(const Vector3f &p,
+                             Vector3f &tolight,
+                             Vector3f &intensity,
+                             float &distToLight) const
+{
+    // the direction to the light is the opposite of the
+    // direction of the directional light source
 
-    Ray DirectionalLight::emit() const
-    {
-        Ray ray(Vector3f(0., 0., 0.), _direction);
-        return ray;
-    }
+    // BEGIN STARTER
+    tolight = -_direction;
+    intensity  = _color;
+    distToLight = std::numeric_limits<float>::max();
+    // END STARTER
+}
 
-    void PointLight::getIllumination(const Vector3f &p, 
-                                 Vector3f &tolight, 
-                                 Vector3f &intensity, 
-                                 float &distToLight) const
-    {
-        // TODO Implement point light source
-        // tolight, intensity, distToLight are outputs
+Ray DirectionalLight::emit() const
+{
+    Ray ray(Vector3f(0., 0., 0.), _direction);
+    return ray;
+}
 
-        tolight = _position - p;
-        distToLight = tolight.abs();
-        tolight.normalize();
-        intensity = _color / (_falloff * (float)pow(distToLight, 2));
-    }
+void PointLight::getIllumination(const Vector3f &p,
+                             Vector3f &tolight,
+                             Vector3f &intensity,
+                             float &distToLight) const
+{
+    // TODO Implement point light source
+    // tolight, intensity, distToLight are outputs
 
-    Ray PointLight::emit() const
-    {
-        std::default_random_engine generator;
-        std::uniform_real_distribution<float> theta_dist(0., 2*M_PI);
-        std::uniform_real_distribution<float> cosphi_dist(-1., 1.);
+    tolight = _position - p;
+    distToLight = tolight.abs();
+    tolight.normalize();
+    intensity = _color / (_falloff * (float)pow(distToLight, 2));
+}
 
-        float theta = theta_dist(generator);
-        float cosphi = cosphi_dist(generator);
+Ray PointLight::emit() const
+{
+    std::default_random_engine generator;
+    std::uniform_real_distribution<float> theta_dist(0., 2*M_PI);
+    std::uniform_real_distribution<float> cosphi_dist(-1., 1.);
 
-        Vector3f dir((1 - cosphi*cosphi)*cos(theta),
-                     (1 - cosphi*cosphi)*sin(theta),
-                     cosphi);
+    float theta = theta_dist(generator);
+    float cosphi = cosphi_dist(generator);
 
-        Ray ray(_position, dir);
-        return ray;
-    }
+    Vector3f dir((1 - cosphi*cosphi)*cos(theta),
+                 (1 - cosphi*cosphi)*sin(theta),
+                 cosphi);
 
+    Ray ray(_position, dir);
+    return ray;
+}
