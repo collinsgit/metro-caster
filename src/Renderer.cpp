@@ -186,12 +186,6 @@ void Renderer::Render()
     if (!_args.output_file.empty()) {
         image.savePNG(_args.output_file);
     }
-//    if (_args.depth_file.size()) {
-//        dimage.savePNG(_args.depth_file);
-//    }
-//    if (_args.normals_file.size()) {
-//        nimage.savePNG(_args.normals_file);
-//    }
 }
 
 

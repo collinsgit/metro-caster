@@ -18,9 +18,6 @@ ArgParser::ArgParser(int argc, const char *argv[])
         } else if (!strcmp(argv[i], "-output")) {
             i++; assert (i < argc); 
             output_file = argv[i];
-        } else if (!strcmp(argv[i], "-normals")) {
-            i++; assert (i < argc); 
-            normals_file = argv[i];
         } else if (!strcmp(argv[i], "-size")) {
             i++; assert (i < argc); 
             width = atoi(argv[i]);
@@ -34,8 +31,6 @@ ArgParser::ArgParser(int argc, const char *argv[])
             depth_min = (float)atof(argv[i]);
             i++; assert (i < argc); 
             depth_max = (float)atof(argv[i]);
-            i++; assert (i < argc); 
-            depth_file = argv[i];
         } else if (!strcmp(argv[i], "-bounces")) {
             i++; assert (i < argc); 
             bounces = atoi(argv[i]);
@@ -60,8 +55,6 @@ ArgParser::ArgParser(int argc, const char *argv[])
     std::cout << "Args:\n";
     std::cout << "- input: " << input_file << std::endl;
     std::cout << "- output: " << output_file << std::endl;
-    std::cout << "- depth_file: " << depth_file << std::endl;
-    std::cout << "- normals_file: " << normals_file << std::endl;
     std::cout << "- width: " << width << std::endl;
     std::cout << "- height: " << height << std::endl;
     std::cout << "- depth_min: " << depth_min << std::endl;
@@ -77,8 +70,6 @@ ArgParser::defaultValues()
     // rendering output
     input_file = "";
     output_file = "";
-    depth_file = "";
-    normals_file = "";
     width = 100;
     height = 100;
     stats = 0;

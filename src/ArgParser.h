@@ -14,8 +14,6 @@ public:
     // rendering output
     std::string input_file;
     std::string output_file;
-    std::string depth_file;
-    std::string normals_file;
     int width;
     int height;
     int stats;
