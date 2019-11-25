@@ -8,7 +8,6 @@
 #include <functional>
 #include <thread>
 #include <vector>
-#include <iostream>
 
 void parallel_for(unsigned n_elements, const std::function<void(int start, int end)>& func) {
     // Find the number of threads and allocate batch sizes.
