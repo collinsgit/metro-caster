@@ -16,20 +16,10 @@ public:
     std::string output_file;
     int width;
     int height;
-    int stats;
 
     // rendering options
-    float depth_min;
-    float depth_max;
     int iters;
     float length;
-    int bounces;
-    bool shadows;
-    bool refraction;
-
-    // supersampling
-    bool jitter;
-    bool filter;
 
     // logging
     std::string log_file;
