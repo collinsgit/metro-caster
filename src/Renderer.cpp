@@ -14,7 +14,7 @@ Renderer::Renderer(const ArgParser &args) :
         _scene(args.input_file) {
 }
 
-Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, int length, int iters) {
+Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, float length, int iters) {
     Vector3f color;
 
     // Average over multiple iterations
