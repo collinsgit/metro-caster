@@ -21,9 +21,6 @@ public:
     void Render();
 
 private:
-    Vector3f traceRay(const Ray &ray, float tmin, int bounces,
-                      Hit &hit, float refIndex) const;
-
     Vector3f estimatePixel(const Ray &ray, float tmin, float length, int iters);
 
     std::vector<Ray> choosePath(const Ray &ray, Object3D *light, float tmin, float length, std::vector<Hit> &hits) const;
