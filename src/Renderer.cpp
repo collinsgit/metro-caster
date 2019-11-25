@@ -20,25 +20,24 @@ Renderer::Renderer(const ArgParser &args) :
 }
 
 Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, float length, int iters) {
+    // Average over multiple iterations.
     Vector3f color;
+    parallel_for(iters, [&](int start, int end) {
+        for (int i = start; i < end; i++) {
+            // 1. Choose a light
+            std::default_random_engine generator;
+            std::uniform_int_distribution<int> uniform(0, _scene.lights.size() - 1);
+            Object3D *light = _scene.lights[uniform(generator)];
 
-    // Average over multiple iterations
-    for (int i = 0; i < iters; i++) {
-
-        // 1. Choose a light
-        std::default_random_engine generator;
-        std::uniform_int_distribution<int> uniform(0, _scene.lights.size() - 1);
-        Object3D *light = _scene.lights[uniform(generator)];
-
-        std::vector<Hit> hits;
-        float prob_path = 1;
-        std::vector<Ray> path = choosePath(ray, light, tmin, length, prob_path, hits);
-        Vector3f path_color = colorPath(path, tmin, hits);
-        // TODO: Include probability factor
-        // color += path_color / prob_path;
-        color += path_color;
-    }
-
+            std::vector<Hit> hits;
+            float prob_path = 1;
+            std::vector<Ray> path = choosePath(ray, light, tmin, length, prob_path, hits);
+            Vector3f path_color = colorPath(path, tmin, hits);
+            // TODO: Include probability factor
+            // color += path_color / prob_path;
+            color += path_color;
+        }
+    }, length > 100);
     return color / (float) iters;
 }
 
