@@ -35,6 +35,22 @@ Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, float length, int i
     return color / (float) iters;
 }
 
+Vector3f weightedCosineHemisphere(const Vector3f &normal) {
+    std::default_random_engine generator(rand());
+    std::uniform_real_distribution<float> uniform(0.f, 1.f);
+
+    float r = sqrt(uniform(generator));
+    float v = 2.f * (float)M_PI * uniform(generator);
+
+    // TODO: think of a better way to do this
+    Vector3f x = Vector3f::cross(Vector3f(1., 2., 3.), normal).normalized();
+    Vector3f y = Vector3f::cross(x, normal).normalized();
+
+    float factor = sqrt(1-r*r);
+
+    return r * normal + factor * (sin(v) * x + cos(v) * y);
+}
+
 std::vector<Ray> Renderer::tracePath(Ray r,
                                      float tmin,
                                      int length) const {
@@ -48,9 +64,7 @@ std::vector<Ray> Renderer::tracePath(Ray r,
         if (_scene.getGroup()->intersect(r, tmin, h)) {
             Vector3f o = r.pointAtParameter(h.getT());
 
-            // TODO: modify direction to allow for reflection/refraction
-            Vector3f d = r.getDirection() - 2 * Vector3f::dot(r.getDirection(), h.getNormal()) * h.getNormal();
-            d.normalize();
+            Vector3f d = weightedCosineHemisphere(h.getNormal());
 
             r = Ray(o, d);
             path.push_back(r);
