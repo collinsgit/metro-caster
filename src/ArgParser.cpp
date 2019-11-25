@@ -29,14 +29,7 @@ ArgParser::ArgParser(int argc, const char *argv[]) {
         }
 
         // rendering options
-        else if (!strcmp(argv[i], "-depth")) {
-            i++;
-            assert (i < argc);
-            depth_min = (float) atof(argv[i]);
-            i++;
-            assert (i < argc);
-            depth_max = (float) atof(argv[i]);
-        } else if (!strcmp(argv[i], "-iters")) {
+        else if (!strcmp(argv[i], "-iters")) {
             i++;
             assert (i < argc);
             iters = atoi(argv[i]);
@@ -44,21 +37,6 @@ ArgParser::ArgParser(int argc, const char *argv[]) {
             i++;
             assert (i < argc);
             length = atof(argv[i]);
-        } else if (!strcmp(argv[i], "-bounces")) {
-            i++;
-            assert (i < argc);
-            bounces = atoi(argv[i]);
-        } else if (!strcmp(argv[i], "-shadows")) {
-            shadows = true;
-        } else if (!strcmp(argv[i], "-refract")) {
-            refraction = true;
-        }
-
-        // supersampling
-        else if (strcmp(argv[i], "-jitter") == 0) {
-            jitter = true;
-        } else if (strcmp(argv[i], "-filter") == 0) {
-            filter = true;
         }
 
         // logging
@@ -80,13 +58,8 @@ ArgParser::ArgParser(int argc, const char *argv[]) {
     std::cout << "- output: " << output_file << std::endl;
     std::cout << "- width: " << width << std::endl;
     std::cout << "- height: " << height << std::endl;
-    std::cout << "- depth_min: " << depth_min << std::endl;
-    std::cout << "- depth_max: " << depth_max << std::endl;
     std::cout << "- iters: " << iters << std::endl;
     std::cout << "- length: " << length << std::endl;
-    std::cout << "- bounces: " << bounces << std::endl;
-    std::cout << "- shadows: " << shadows << std::endl;
-    std::cout << "- refractions: " << refraction << std::endl;
     std::cout << "- log: " << log_file << std::endl;
 }
 
@@ -97,20 +70,10 @@ ArgParser::defaultValues() {
     output_file = "";
     width = 100;
     height = 100;
-    stats = 0;
 
     // rendering options
-    depth_min = 0;
-    depth_max = 1;
     iters = 10;
     length = 1.f;
-    bounces = 0;
-    shadows = false;
-    refraction = false;
-
-    // sampling
-    jitter = false;
-    filter = false;
 
     // logging
     log_file = "";

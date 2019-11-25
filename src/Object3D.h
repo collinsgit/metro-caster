@@ -151,13 +151,14 @@ private:
 // So that the intersect function first transforms the ray
 class Transform : public Object3D {
 public:
-    Transform(const Matrix4f &m, Object3D *obj) : _object(obj), _m(m) {}
+    Transform(const Matrix4f &m, Object3D *obj) : _object(obj), _m(m), _m_inverse(m.inverse()) {}
 
-    virtual bool intersect(const Ray &r, float tmin, Hit &h) const override;
+    bool intersect(const Ray &r, float tmin, Hit &h) const override;
 
 private:
     Object3D *_object;  // un-transformed object
     Matrix4f _m;
+    Matrix4f _m_inverse;
 };
 
 

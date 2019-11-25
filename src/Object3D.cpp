@@ -94,12 +94,10 @@ bool Group::intersect(const Ray &r, float tmin, Hit &h) const {
 
 bool Plane::intersect(const Ray &r, float tmin, Hit &h) const {
     float t = (_d - Vector3f::dot(r.getOrigin(), _normal)) / Vector3f::dot(r.getDirection(), _normal);
-
     if ((t > tmin) && (t < h.getT())) {
         h.set(t, this->material, _normal);
         return true;
     }
-
     return false;
 }
 
@@ -182,14 +180,12 @@ bool Torus::intersect(const Ray &r, float tmin, Hit &h) const {
 
 
 bool Transform::intersect(const Ray &r, float tmin, Hit &h) const {
-    Matrix4f m_inverse = _m.inverse();
-    Ray new_r(VecUtils::transformPoint(m_inverse, r.getOrigin()),
-              VecUtils::transformDirection(m_inverse, r.getDirection()));
+    Ray new_r(VecUtils::transformPoint(_m_inverse, r.getOrigin()),
+              VecUtils::transformDirection(_m_inverse, r.getDirection()));
+
     bool hit = _object->intersect(new_r, tmin, h);
-
     if (hit) {
-        h.normal = VecUtils::transformDirection(m_inverse.transposed(), h.normal).normalized();
+        h.normal = VecUtils::transformDirection(_m_inverse.transposed(), h.normal).normalized();
     }
-
     return hit;
 }

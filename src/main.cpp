@@ -53,13 +53,8 @@ void logProgramOutput(const ArgParser &argParser,
     logging << "- output: " << argParser.output_file << std::endl;
     logging << "- width: " << argParser.width << std::endl;
     logging << "- height: " << argParser.height << std::endl;
-    logging << "- depth_min: " << argParser.depth_min << std::endl;
-    logging << "- depth_max: " << argParser.depth_max << std::endl;
     logging << "- iters: " << argParser.iters << std::endl;
     logging << "- length: " << argParser.length << std::endl;
-    logging << "- bounces: " << argParser.bounces << std::endl;
-    logging << "- shadows: " << argParser.shadows << std::endl;
-    logging << "- refractions: " << argParser.refraction << std::endl;
     logging << "- log: " << argParser.log_file << std::endl;
     logging << "[END TIME: " << stopTimeBuffer << "]\n";
     logging << "Total Duration: " << durationString << "\n\n";
@@ -76,11 +71,8 @@ main(int argc, const char *argv[]) {
                   << "\t-input <scene>\n"
                   << "\t-size <width> <height>\n"
                   << "\t-output <image.png>\n"
-                  << "\t[-depth <depth_min> <depth_max>]\n"
                   << "\t[-iters <iterations>]\n"
                   << "\t[-length <path_lengths>]\n"
-                  << "\t[-bounces <max_bounces>\n]"
-                  << "\t[-shadows]\n"
                   << "\t[-log <log.txt>]\n"
                   << "\n";
         return 1;
