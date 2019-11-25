@@ -12,6 +12,7 @@
 #include "Material.h"
 #include "Object3D.h"
 #include "Mesh.h"
+#include "Sampler.h"
 
 #define MAX_PARSER_TOKEN_LENGTH 100
 
@@ -60,6 +61,7 @@ public:
     }
 
     std::vector<Object3D *> lights;
+    Sampler sampler = cosineWeightedHemisphere();
 private:
     void parseFile();
 

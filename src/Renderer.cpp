@@ -41,22 +41,6 @@ Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, float length, int i
     return color / (float) iters;
 }
 
-Vector3f weightedCosineHemisphere(const Vector3f &normal) {
-    std::default_random_engine generator(rand());
-    std::uniform_real_distribution<float> uniform(0.f, 1.f);
-
-    float r = sqrt(uniform(generator));
-    float v = 2.f * (float)M_PI * uniform(generator);
-
-    // TODO: think of a better way to do this
-    Vector3f x = Vector3f::cross(Vector3f(1., 2., 3.), normal).normalized();
-    Vector3f y = Vector3f::cross(x, normal).normalized();
-
-    float factor = sqrt(1-r*r);
-
-    return r * normal + factor * (sin(v) * x + cos(v) * y);
-}
-
 std::vector<Ray> Renderer::tracePath(Ray r,
                                      float tmin,
                                      int length,
@@ -72,8 +56,8 @@ std::vector<Ray> Renderer::tracePath(Ray r,
         if (_scene.getGroup()->intersect(r, tmin, h)) {
             Vector3f o = r.pointAtParameter(h.getT());
 
-            Vector3f d = weightedCosineHemisphere(h.getNormal());
-            prob_path *= Vector3f::dot(d, h.getNormal()) / M_PI;
+            Vector3f d = _scene.sampler.sample(r, h.getNormal());
+            prob_path *= _scene.sampler.pdf(d, h.getNormal());
 
             r = Ray(o, d);
             path.push_back(r);
@@ -155,7 +139,7 @@ Vector3f Renderer::colorPath(const std::vector<Ray> &path, float tmin, std::vect
         Ray r = path[i];
         Hit h = hits[i];
         if (i == path.size() - 1) {
-            dirToLight = weightedCosineHemisphere(h.getNormal());
+            dirToLight = _scene.sampler.sample(r, h.getNormal());
         } else {
             dirToLight = path[i + 1].getDirection();
         }

@@ -32,6 +32,7 @@ set(CPP_FILES
     ${SRC_DIR}Object3D.cpp
     ${SRC_DIR}Octree.cpp
     ${SRC_DIR}Renderer.cpp
+    ${SRC_DIR}Sampler.cpp
     ${SRC_DIR}SceneParser.cpp
     )
 
@@ -47,6 +48,7 @@ set(CPP_HEADERS
     ${SRC_DIR}Object3D.h
     ${SRC_DIR}Octree.h
     ${SRC_DIR}Renderer.h
+    ${SRC_DIR}Sampler.h
     ${SRC_DIR}SceneParser.h
     ${SRC_DIR}VecUtils.h
     )
