@@ -26,11 +26,11 @@ private:
 
     Vector3f estimatePixel(const Ray &ray, float tmin, float length, int iters);
 
-    std::vector<Ray> choosePath(const Ray &ray, Object3D *light, float tmin, float length) const;
+    std::vector<Ray> choosePath(const Ray &ray, Object3D *light, float tmin, float length, std::vector<Hit> &hits) const;
 
-    std::vector<Ray> tracePath(Ray ray, float tmin, int length) const;
+    std::vector<Ray> tracePath(Ray ray, float tmin, int length, std::vector<Hit> &hits) const;
 
-    Vector3f colorPath(const std::vector<Ray> &path, float tmin);
+    Vector3f colorPath(const std::vector<Ray> &path, float tmin, std::vector<Hit> hits);
 
     float probPath(const std::vector<Ray> &path);
 
