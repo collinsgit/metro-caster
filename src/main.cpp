@@ -26,8 +26,8 @@ std::string format_duration( std::chrono::milliseconds ms ) {
 
 // Logs program output to a file for ease of access at a later time.
 void logProgramOutput(const ArgParser &argParser,
-                      std::chrono::high_resolution_clock::time_point start,
-                      std::chrono::high_resolution_clock::time_point stop,
+                      std::chrono::system_clock::time_point start,
+                      std::chrono::system_clock::time_point stop,
                       const std::string& durationString) {
     // Sanity check that the log file is specified.
     assert(!argParser.log_file.empty());
@@ -37,12 +37,12 @@ void logProgramOutput(const ArgParser &argParser,
     logging.open(argParser.log_file, std::ios_base::app);
 
     // Create time_t for the start and end times to get the current date and time.
-    time_t startTime_t = std::chrono::high_resolution_clock::to_time_t(start);
+    time_t startTime_t = std::chrono::system_clock::to_time_t(start);
     tm* startTime = localtime(&startTime_t);
     char startTimeBuffer[80];
     strftime(startTimeBuffer, 80, "%c", startTime);
 
-    time_t stopTime_t = std::chrono::high_resolution_clock::to_time_t(stop);
+    time_t stopTime_t = std::chrono::system_clock::to_time_t(stop);
     tm* stopTime = localtime(&stopTime_t);
     char stopTimeBuffer[80];
     strftime(stopTimeBuffer, 80, "%c", stopTime);
@@ -87,11 +87,11 @@ main(int argc, const char *argv[]) {
     }
 
     // Record the start and end time of the program to be saved later.
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::system_clock::now();
     ArgParser argsParser(argc, argv);
     Renderer renderer(argsParser);
     renderer.Render();
-    auto stop = std::chrono::high_resolution_clock::now();
+    auto stop = std::chrono::system_clock::now();
 
     // Get the overall duration to print out.
     long duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
