@@ -10,8 +10,8 @@
 
 class Sampler {
 public:
-    Sampler() = default;
-    virtual ~Sampler() = default;
+    Sampler() {};
+    virtual ~Sampler() {};
 
     virtual Vector3f sample(const Ray &ray, const Vector3f &normal) const {
         return Vector3f(0);
@@ -24,8 +24,12 @@ public:
 
 class cosineWeightedHemisphere : public Sampler {
 public:
-    cosineWeightedHemisphere() = default;
+    virtual Vector3f sample(const Ray &ray, const Vector3f &normal) const override;
+    virtual float pdf(const Vector3f &dir, const Vector3f &normal) const override;
+};
 
+class pureReflectance : public Sampler {
+public:
     virtual Vector3f sample(const Ray &ray, const Vector3f &normal) const override;
     virtual float pdf(const Vector3f &dir, const Vector3f &normal) const override;
 };

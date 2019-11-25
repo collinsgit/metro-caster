@@ -7,6 +7,7 @@
 #endif
 
 Vector3f cosineWeightedHemisphere::sample(const Ray &ray, const Vector3f &normal) const {
+    std::cout << "lmao\n";
     std::default_random_engine generator(rand());
     std::uniform_real_distribution<float> uniform(0.f, 1.f);
 
@@ -26,4 +27,13 @@ float cosineWeightedHemisphere::pdf(const Vector3f &dir, const Vector3f &normal)
     float dot = Vector3f::dot(dir, normal);
     dot = dot < 0 ? 0 : dot;
     return dot / M_PI;
+}
+
+Vector3f pureReflectance::sample(const Ray &ray, const Vector3f &normal) const {
+    std::cout << "wtf";
+    return (ray.getDirection() - 2 * Vector3f::dot(ray.getDirection(), normal) * normal).normalized();
+}
+
+float pureReflectance::pdf(const Vector3f &dir, const Vector3f &normal) const {
+    return 1;
 }

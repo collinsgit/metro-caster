@@ -61,7 +61,7 @@ public:
     }
 
     std::vector<Object3D *> lights;
-    Sampler sampler = cosineWeightedHemisphere();
+    Sampler sampler;
 private:
     void parseFile();
 

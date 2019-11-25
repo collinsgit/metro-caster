@@ -67,6 +67,8 @@ SceneParser::SceneParser(const std::string &filename) :
         std::cerr << "WARNING: No lights specified\n";
         _ambient_light = Vector3f(1, 1, 1);
     }
+
+    sampler = pureReflectance();
 }
 
 SceneParser::~SceneParser() {
