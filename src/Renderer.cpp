@@ -57,8 +57,8 @@ std::vector<Ray> Renderer::tracePath(Ray r,
         if (_scene.getGroup()->intersect(r, tmin, h)) {
             Vector3f o = r.pointAtParameter(h.getT());
 
-            Vector3f d = _scene.sampler.sample(r, h.getNormal());
-            prob_path *= _scene.sampler.pdf(d, h.getNormal());
+            Vector3f d = _scene.sampler->sample(r, h.getNormal());
+            prob_path *= _scene.sampler->pdf(d, h.getNormal());
 
             r = Ray(o, d);
             path.push_back(r);
@@ -140,7 +140,7 @@ Vector3f Renderer::colorPath(const std::vector<Ray> &path, float tmin, std::vect
         Ray r = path[i];
         Hit h = hits[i];
         if (i == path.size() - 1) {
-            dirToLight = _scene.sampler.sample(r, h.getNormal());
+            dirToLight = _scene.sampler->sample(r, h.getNormal());
         } else {
             dirToLight = path[i + 1].getDirection();
         }

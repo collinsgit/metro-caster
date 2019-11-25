@@ -61,7 +61,7 @@ public:
     }
 
     std::vector<Object3D *> lights;
-    Sampler sampler;
+    Sampler *sampler;
 private:
     void parseFile();
 
