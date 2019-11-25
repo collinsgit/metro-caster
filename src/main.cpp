@@ -28,7 +28,7 @@ std::string format_duration( std::chrono::milliseconds ms ) {
 void logProgramOutput(const ArgParser &argParser,
                       std::chrono::high_resolution_clock::time_point start,
                       std::chrono::high_resolution_clock::time_point stop,
-                      std::string durationString) {
+                      const std::string& durationString) {
     // Sanity check that the log file is specified.
     assert(!argParser.log_file.empty());
 
@@ -38,11 +38,13 @@ void logProgramOutput(const ArgParser &argParser,
 
     // Create time_t for the start and end times to get the current date and time.
     time_t startTime_t = std::chrono::high_resolution_clock::to_time_t(start);
-    time_t stopTime_t = std::chrono::high_resolution_clock::to_time_t(stop);
     tm* startTime = localtime(&startTime_t);
-    tm* stopTime = localtime(&stopTime_t);
-    char startTimeBuffer[80], stopTimeBuffer[80];
+    char startTimeBuffer[80];
     strftime(startTimeBuffer, 80, "%c", startTime);
+
+    time_t stopTime_t = std::chrono::high_resolution_clock::to_time_t(stop);
+    tm* stopTime = localtime(&stopTime_t);
+    char stopTimeBuffer[80];
     strftime(stopTimeBuffer, 80, "%c", stopTime);
 
     // Write to the log.
