@@ -6,12 +6,13 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-Vector3f cosineWeightedHemisphere::sample(const Ray &ray, const Vector3f &normal) const {
+Vector3f cosineWeightedHemisphere::sample(const Ray &ray, Hit &h) const {
     std::default_random_engine generator(rand());
     std::uniform_real_distribution<float> uniform(0.f, 1.f);
 
     float r = sqrt(uniform(generator));
     float v = 2.f * (float)M_PI * uniform(generator);
+    Vector3f normal = h.getNormal();
 
     // TODO: think of a better way to do this
     Vector3f x = Vector3f::cross(Vector3f(1., 2., 3.), normal).normalized();
@@ -22,16 +23,16 @@ Vector3f cosineWeightedHemisphere::sample(const Ray &ray, const Vector3f &normal
     return r * normal + factor * (sin(v) * x + cos(v) * y);
 }
 
-float cosineWeightedHemisphere::pdf(const Vector3f &dir, const Vector3f &normal) const {
-    float dot = Vector3f::dot(dir, normal);
+float cosineWeightedHemisphere::pdf(const Vector3f &dir, Hit &h) const {
+    float dot = Vector3f::dot(dir, h.getNormal());
     dot = dot < 0 ? 0 : dot;
     return dot / M_PI;
 }
 
-Vector3f pureReflectance::sample(const Ray &ray, const Vector3f &normal) const {
-    return (ray.getDirection() - 2 * Vector3f::dot(ray.getDirection(), normal) * normal).normalized();
+Vector3f pureReflectance::sample(const Ray &ray, Hit &h) const {
+    return (ray.getDirection() - 2 * Vector3f::dot(ray.getDirection(), h.getNormal()) * h.getNormal()).normalized();
 }
 
-float pureReflectance::pdf(const Vector3f &dir, const Vector3f &normal) const {
+float pureReflectance::pdf(const Vector3f &dir, Hit &h) const {
     return 1;
 }
