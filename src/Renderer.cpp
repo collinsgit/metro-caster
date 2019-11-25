@@ -131,7 +131,7 @@ std::vector<Ray> Renderer::choosePath(const Ray &r,
 
     // Update the hits accordingly.
    hits.emplace_back(connector_hit);
-    for (int i = (int) light_hits.size() - 1; i > 0; i--) {
+    for (int i = (int) light_hits.size() - 2; i >= 0; i--) {
         hits.emplace_back(light_hits[i]);
     }
 
