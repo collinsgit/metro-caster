@@ -1,5 +1,6 @@
-#include "Object3D.h"
 #include "VecUtils.h"
+
+#include "Object3D.h"
 #include "quartic.cpp"
 #include <cmath>
 #include <random>
@@ -88,7 +89,6 @@ bool Group::intersect(const Ray &r, float tmin, Hit &h) const {
         }
     }
     return hit;
-    // END STARTER
 }
 
 

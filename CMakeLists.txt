@@ -18,8 +18,12 @@ endif()
 # vecmath include directory
 include_directories(vecmath/include)
 add_subdirectory(vecmath)
-set (SRC_DIR "src/")
 
+# parallelcomp include directory
+include_directories(parallelcomp/include)
+add_subdirectory(parallelcomp)
+
+set (SRC_DIR "src/")
 set(CPP_FILES
     ${SRC_DIR}main.cpp
     ${SRC_DIR}stb.cpp
@@ -57,5 +61,4 @@ SOURCE_GROUP(stb FILES ${STB_SRC})
 
 
 add_executable(metrocaster ${CPP_FILES} ${CPP_HEADERS} ${STB_SRC})
-target_link_libraries(metrocaster vecmath)
-
+target_link_libraries(metrocaster vecmath parallelcomp)

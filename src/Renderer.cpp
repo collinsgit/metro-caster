@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "Image.h"
 #include "Ray.h"
+#include "iterator.h"
 #include "VecUtils.h"
 
 #include <random>
@@ -175,19 +176,21 @@ void Renderer::Render() {
     // It also write to the color image.
     Image image(w, h);
     Camera *cam = _scene.getCamera();
-    for (int y = 0; y < h; ++y) {
-        float ndcy = 2 * (y / (h - 1.0f)) - 1.0f;
-        for (int x = 0; x < w; ++x) {
-            float ndcx = 2 * (x / (w - 1.0f)) - 1.0f;
-            // Use PerspectiveCamera to generate a ray.
-            Ray r = cam->generateRay(Vector2f(ndcx, ndcy));
-
-            Hit hit;
-            Vector3f color = estimatePixel(r, 0.01, length, iters);
-
-            image.setPixel(x, y, color);
+    parallel_for(h, [&](int start, int end) {
+        for (int i = start; i < end; ++i) {
+            float ndcy = 2 * (i / (h - 1.0f)) - 1.0f;
+            parallel_for(w, [&](int innerStart, int innerEnd) {
+                for (int j = innerStart; j < innerEnd; ++j) {
+                    // Use PerspectiveCamera to generate a ray.
+                    float ndcx = 2 * (j / (w - 1.0f)) - 1.0f;
+                    Ray r = cam->generateRay(Vector2f(ndcx, ndcy));
+                    Hit hit;
+                    Vector3f color = estimatePixel(r, 0.01, length, iters);
+                    image.setPixel(j, i, color);
+                }
+            });
         }
-    }
+    });
 
     // Save the output file.
     if (!_args.output_file.empty()) {
