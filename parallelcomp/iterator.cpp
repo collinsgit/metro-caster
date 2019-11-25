@@ -9,7 +9,7 @@
 #include <thread>
 #include <vector>
 
-void parallel_for(unsigned n_elements, const std::function<void(int start, int end)>& func) {
+void parallel_for(unsigned n_elements, const std::function<void(int start, int end)>& func, bool parallelize) {
     // Find the number of threads and allocate batch sizes.
     unsigned n_threads_hint = std::thread::hardware_concurrency();
     unsigned n_threads = n_threads_hint == 0 ? 8 : (n_threads_hint);
@@ -18,13 +18,22 @@ void parallel_for(unsigned n_elements, const std::function<void(int start, int e
 
     // Create threads for each batch of work.
     std::vector<std::thread> threads(n_threads);
-    for (unsigned i = 0; i < n_threads; ++i) {
-        int start = i * batch_size;
-        threads[i] = std::thread(func, start, start+batch_size);
+    if (parallelize) {
+        for (unsigned i = 0; i < n_threads; ++i) {
+            int start = i * batch_size;
+            threads[i] = std::thread(func, start, start+batch_size);
+        }
+    } else {
+        for (unsigned i = 0; i < n_threads; ++i) {
+            int start = i * batch_size;
+            func(start, start+batch_size);
+        }
     }
 
     // Deform elements and launch threads, waiting for them to finish.
     int start = n_threads * batch_size;
     func(start, start+batch_remainder);
-    std::for_each(threads.begin(), threads.end(), std::mem_fn(&std::thread::join));
+    if (parallelize) {
+        std::for_each(threads.begin(), threads.end(), std::mem_fn(&std::thread::join));
+    }
 }
