@@ -30,10 +30,12 @@ Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, float length, int i
         Object3D *light = _scene.lights[uniform(generator)];
 
         std::vector<Hit> hits;
-        std::vector<Ray> path = choosePath(ray, light, tmin, length, hits);
+        float prob_path = 1;
+        std::vector<Ray> path = choosePath(ray, light, tmin, length, prob_path, hits);
         Vector3f path_color = colorPath(path, tmin, hits);
-        float path_prob = probPath(path);
-        color += path_color / path_prob;
+        // TODO: Include probability factor
+        // color += path_color / prob_path;
+        color += path_color;
     }
 
     return color / (float) iters;
@@ -58,6 +60,7 @@ Vector3f weightedCosineHemisphere(const Vector3f &normal) {
 std::vector<Ray> Renderer::tracePath(Ray r,
                                      float tmin,
                                      int length,
+                                     float &prob_path,
                                      std::vector<Hit> &hits) const {
     assert(length >= 1);
 
@@ -70,6 +73,7 @@ std::vector<Ray> Renderer::tracePath(Ray r,
             Vector3f o = r.pointAtParameter(h.getT());
 
             Vector3f d = weightedCosineHemisphere(h.getNormal());
+            prob_path *= Vector3f::dot(d, h.getNormal()) / M_PI;
 
             r = Ray(o, d);
             path.push_back(r);
@@ -86,6 +90,7 @@ std::vector<Ray> Renderer::choosePath(const Ray &r,
                                       Object3D *light,
                                       float tmin,
                                       float length,
+                                      float &prob_path,
                                       std::vector<Hit> &hits) const {
     std::default_random_engine generator(rand());
     std::poisson_distribution<int> poisson(length);
@@ -93,11 +98,14 @@ std::vector<Ray> Renderer::choosePath(const Ray &r,
     // 2. Draw light path
     int light_length = 1 + poisson(generator);
     std::vector<Hit> light_hits;
-    std::vector<Ray> light_path = tracePath(light->sample(), tmin, light_length, light_hits);
+    float light_prob = 1;
+    std::vector<Ray> light_path = tracePath(light->sample(), tmin, light_length, light_prob, light_hits);
 
     // 3. Draw eye path
     int eye_length = 1 + poisson(generator);
-    std::vector<Ray> path = tracePath(r, tmin, eye_length, hits);
+    float eye_prob = 1;
+    std::vector<Ray> path = tracePath(r, tmin, eye_length, eye_prob, hits);
+    prob_path *= eye_prob;
 
     // 4. Check for light path obstruction
     Ray last_eye = path[path.size() - 1];
@@ -112,6 +120,7 @@ std::vector<Ray> Renderer::choosePath(const Ray &r,
     if (connector_hit.getT() + eps < dir.abs()) {
         return path;
     }
+    prob_path *= light_prob;
 
     // 5. Build Complete Path
     path[path.size() - 1] = connector;
@@ -121,7 +130,7 @@ std::vector<Ray> Renderer::choosePath(const Ray &r,
     }
 
     // Update the hits accordingly.
-    hits.emplace_back(connector_hit);
+   hits.emplace_back(connector_hit);
     for (int i = (int) light_hits.size() - 1; i > 0; i--) {
         hits.emplace_back(light_hits[i]);
     }
@@ -146,8 +155,7 @@ Vector3f Renderer::colorPath(const std::vector<Ray> &path, float tmin, std::vect
         Ray r = path[i];
         Hit h = hits[i];
         if (i == path.size() - 1) {
-            dirToLight = (r.getDirection() -
-                          2 * Vector3f::dot(r.getDirection(), h.getNormal()) * h.getNormal()).normalized();
+            dirToLight = weightedCosineHemisphere(h.getNormal());
         } else {
             dirToLight = path[i + 1].getDirection();
         }
@@ -155,12 +163,6 @@ Vector3f Renderer::colorPath(const std::vector<Ray> &path, float tmin, std::vect
     }
 
     return lightIntensity;
-}
-
-float Renderer::probPath(const std::vector<Ray> &path) {
-    float prob = 1; // 1. / (4 * M_PI);
-
-    return prob;
 }
 
 void Renderer::Render() {
