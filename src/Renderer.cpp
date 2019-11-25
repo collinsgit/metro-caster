@@ -14,7 +14,7 @@ Renderer::Renderer(const ArgParser &args) :
         _scene(args.input_file) {
 }
 
-Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, int length, int iters) {
+Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, float length, int iters) {
     Vector3f color;
 
     // Average over multiple iterations
@@ -25,9 +25,9 @@ Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, int length, int ite
         std::uniform_int_distribution<int> uniform(0, _scene.lights.size() - 1);
         Object3D *light = _scene.lights[uniform(generator)];
 
-        std::vector<Ray> path = choosePath(ray, light, tmin, length);
-
-        Vector3f path_color = colorPath(path, tmin);
+        std::vector<Hit> hits;
+        std::vector<Ray> path = choosePath(ray, light, tmin, length, hits);
+        Vector3f path_color = colorPath(path, tmin, hits);
         float path_prob = probPath(path);
         color += path_color / path_prob;
     }
@@ -37,7 +37,8 @@ Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, int length, int ite
 
 std::vector<Ray> Renderer::tracePath(Ray r,
                                      float tmin,
-                                     int length) const {
+                                     int length,
+                                     std::vector<Hit> &hits) const {
     assert(length >= 1);
 
     std::vector<Ray> path;
@@ -54,6 +55,7 @@ std::vector<Ray> Renderer::tracePath(Ray r,
 
             r = Ray(o, d);
             path.push_back(r);
+            hits.push_back(h);
         } else {
             break;
         }
@@ -65,17 +67,19 @@ std::vector<Ray> Renderer::tracePath(Ray r,
 std::vector<Ray> Renderer::choosePath(const Ray &r,
                                       Object3D *light,
                                       float tmin,
-                                      float length) const {
+                                      float length,
+                                      std::vector<Hit> &hits) const {
     std::default_random_engine generator(rand());
     std::poisson_distribution<int> poisson(length);
 
     // 2. Draw light path
     int light_length = 1 + poisson(generator);
-    std::vector<Ray> light_path = tracePath(light->sample(), tmin, light_length);
+    std::vector<Hit> light_hits;
+    std::vector<Ray> light_path = tracePath(light->sample(), tmin, light_length, light_hits);
 
     // 3. Draw eye path
     int eye_length = 1 + poisson(generator);
-    std::vector<Ray> path = tracePath(r, tmin, eye_length);
+    std::vector<Ray> path = tracePath(r, tmin, eye_length, hits);
 
     // 4. Check for light path obstruction
     Ray last_eye = path[path.size() - 1];
@@ -98,28 +102,38 @@ std::vector<Ray> Renderer::choosePath(const Ray &r,
                           -light_path[i - 1].getDirection());
     }
 
+    // Update the hits accordingly.
+    hits.emplace_back(connector_hit);
+    for (int i = (int) light_hits.size() - 1; i > 0; i--) {
+        hits.emplace_back(light_hits[i]);
+    }
+
     return path;
 }
 
-Vector3f Renderer::colorPath(const std::vector<Ray> &path, float tmin) {
+Vector3f Renderer::colorPath(const std::vector<Ray> &path, float tmin, std::vector<Hit> hits) {
+    // Set up the intensity and light directions.
     Vector3f dirToLight(0);
     Vector3f lightIntensity = _scene.getAmbientLight();
 
-    for (int i = (int) path.size() - 1; i >= 0; i--) {
-        Ray r = path[i];
-        Hit h;
-        if (_scene.getGroup()->intersect(r, tmin, h)) {
-            if (i == path.size() - 1) {
-                dirToLight = (r.getDirection() -
-                              2 * Vector3f::dot(r.getDirection(), h.getNormal()) * h.getNormal()).normalized();
-            } else {
-                dirToLight = path[i + 1].getDirection();
-            }
+    // Add the last hit to the light source in.
+    Ray rayToLight = path[path.size() - 1];
+    Hit lightSourceHit;
+    _scene.getGroup()->intersect(rayToLight, tmin, lightSourceHit);
+    hits.emplace_back(lightSourceHit);
 
-            lightIntensity = h.getMaterial()->shade(r, h, dirToLight, lightIntensity);
+    // Iterate through the paths and hits.
+    for (int i = (int) path.size() - 1; i >= 0; i--) {
+        // Fetch the necessary ray and hit, then update the light intensity.
+        Ray r = path[i];
+        Hit h = hits[i];
+        if (i == path.size() - 1) {
+            dirToLight = (r.getDirection() -
+                          2 * Vector3f::dot(r.getDirection(), h.getNormal()) * h.getNormal()).normalized();
         } else {
-            lightIntensity = _scene.getAmbientLight();
+            dirToLight = path[i + 1].getDirection();
         }
+        lightIntensity = h.getMaterial()->shade(r, h, dirToLight, lightIntensity);
     }
 
     return lightIntensity;
