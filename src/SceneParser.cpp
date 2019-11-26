@@ -68,7 +68,7 @@ SceneParser::SceneParser(const std::string &filename) :
         _ambient_light = Vector3f(1, 1, 1);
     }
 
-    sampler = new blinnPhong;
+    sampler = new cosineWeightedHemisphere;
 }
 
 SceneParser::~SceneParser() {

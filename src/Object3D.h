@@ -28,7 +28,7 @@ public:
 
     virtual bool intersect(const Ray &r, float tmin, Hit &h) const = 0;
 
-    virtual Ray sample() {
+    virtual const Ray sample() {
         return Ray(Vector3f(0), Vector3f(0));
     }
 
@@ -57,7 +57,7 @@ public:
 
     virtual bool intersect(const Ray &r, float tmin, Hit &h) const override;
 
-    virtual Ray sample() override;
+    virtual const Ray sample() override;
 
 private:
     Vector3f _center;

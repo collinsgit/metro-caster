@@ -52,8 +52,7 @@ public:
 
     Vector3f shade(const Ray &ray,
                    const Hit &hit,
-                   const Vector3f &dirToLight,
-                   const Vector3f &lightIntensity);
+                   const Vector3f &dirToLight);
 
 protected:
     Vector3f _diffuseColor;

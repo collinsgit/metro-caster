@@ -56,7 +56,7 @@ bool Sphere::intersect(const Ray &r, float tmin, Hit &h) const {
     return false;
 }
 
-Ray Sphere::sample() {
+const Ray Sphere::sample() {
     std::default_random_engine generator(rand());
     std::uniform_real_distribution<float> theta_dist(0., 2 * M_PI);
     std::uniform_real_distribution<float> cosphi_dist(-1., 1.);

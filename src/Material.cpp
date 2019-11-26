@@ -8,8 +8,7 @@
 
 Vector3f Material::shade(const Ray &ray,
                          const Hit &hit,
-                         const Vector3f &dirToLight,
-                         const Vector3f &lightIntensity) {
+                         const Vector3f &dirToLight) {
 
     Vector3f surfNormal = hit.getNormal();
     Vector3f eyeToSurf = ray.getDirection();
