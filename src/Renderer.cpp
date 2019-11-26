@@ -25,7 +25,7 @@ Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, float length, int i
     parallel_for(iters, [&](int start, int end) {
         for (int i = start; i < end; i++) {
             // 1. Choose a light
-            std::default_random_engine generator;
+            std::default_random_engine generator(rand());
             std::uniform_int_distribution<int> uniform(0, _scene.lights.size() - 1);
             Object3D *light = _scene.lights[uniform(generator)];
 
@@ -76,16 +76,16 @@ std::vector<Ray> Renderer::choosePath(const Ray &r,
                                       float &prob_path,
                                       std::vector<Hit> &hits) const {
     std::default_random_engine generator(rand());
-    std::poisson_distribution<int> poisson(length);
+    std::geometric_distribution<int> geometric(1. / length);
 
     // 2. Draw light path
-    int light_length = 1 + poisson(generator);
+    int light_length = 1 + geometric(generator);
     std::vector<Hit> light_hits;
     float light_prob = 1;
     std::vector<Ray> light_path = tracePath(light->sample(), tmin, light_length, light_prob, light_hits);
 
     // 3. Draw eye path
-    int eye_length = 1 + poisson(generator);
+    int eye_length = 1 + geometric(generator);
     float eye_prob = 1;
     std::vector<Ray> path = tracePath(r, tmin, eye_length, eye_prob, hits);
     prob_path *= eye_prob;
