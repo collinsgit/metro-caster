@@ -63,9 +63,10 @@ Ray Sphere::sample() {
 
     float theta = theta_dist(generator);
     float cosphi = cosphi_dist(generator);
+    float factor = sqrt(1 - cosphi*cosphi);
 
-    Vector3f dir((1 - cosphi * cosphi) * cos(theta),
-                 (1 - cosphi * cosphi) * sin(theta),
+    Vector3f dir(factor * cos(theta),
+                 factor * sin(theta),
                  cosphi);
 
     return Ray{_radius * dir + _center, dir};
