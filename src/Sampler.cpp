@@ -74,19 +74,27 @@ Vector3f blinnPhong::sample(const Ray &ray, Hit &h) const {
                   2 * Vector3f::dot(ray.getDirection(), h.getNormal()) * h.getNormal()).normalized();
         x = Vector3f::cross(Vector3f(1., 2., 3.), normal).normalized();
         y = Vector3f::cross(x, normal).normalized();
+
         for (int i=0; i<max_iters; i++) {
             r = pow(u, 1.f / (1.f + shininess));
             factor = sqrt(1 - r * r);
             output = r * normal + factor * (sin_v * x + cos_v * y);
 
-            if (Vector3f::dot(h.getNormal(), output) > 0) {
+            if (Vector3f::dot(output, h.getNormal()) > 0) {
                 return output;
             }
 
             u = uniform(generator);
-            v = uniform(generator);
+            v = fmod(v + 0.4, 2 * M_PI);
             sin_v = sin(v); cos_v = cos(v);
         }
+
+        r = sqrt(u);
+        factor = sqrt(1-r*r);
+        normal = h.getNormal();
+        x = Vector3f::cross(Vector3f(1., 2., 3.), normal).normalized();
+        y = Vector3f::cross(x, normal).normalized();
+        output = r * normal + factor * (sin_v * x + cos_v * y);
     }
 
     return output;

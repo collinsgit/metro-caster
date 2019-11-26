@@ -168,8 +168,7 @@ void Renderer::Render() {
                     // Use PerspectiveCamera to generate a ray.
                     float ndcx = 2 * (j / (w - 1.0f)) - 1.0f;
                     Ray r = cam->generateRay(Vector2f(ndcx, ndcy));
-                    Hit hit;
-                    Vector3f color = estimatePixel(r, 0.01, length, iters);
+                    Vector3f color = estimatePixel(r, 0.0001, length, iters);
                     image.setPixel(j, i, color);
                 }
             });
