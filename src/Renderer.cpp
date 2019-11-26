@@ -142,7 +142,13 @@ Vector3f Renderer::colorPath(const std::vector<Ray> &path, float tmin, std::vect
         } else {
             dirToLight = path[i + 1].getDirection();
         }
-        lightIntensity = h.getMaterial()->shade(r, h, dirToLight, lightIntensity);
+        float pdf = _scene.sampler->pdf(dirToLight, h) ;
+        Vector3f f = h.getMaterial()->shade(r, h, dirToLight, lightIntensity);
+
+        float g = Vector3f::dot(h.getNormal(), dirToLight);
+        g = g > 0 ? g : 0;
+
+        lightIntensity = h.getMaterial()->getLight() / (2 * M_PI) + (f * g * lightIntensity) / pdf;
     }
 
     return lightIntensity;

@@ -101,5 +101,29 @@ Vector3f blinnPhong::sample(const Ray &ray, Hit &h) const {
 }
 
 float blinnPhong::pdf(const Vector3f &dir, Hit &h) const {
-    return 1;
+    float shininess = h.getMaterial()->getShininess();
+    float prob_spec = (2 + shininess) / (5 + shininess);
+
+    float diffuse_pdf = Vector3f::dot(dir, h.getNormal()) / M_PI;
+    diffuse_pdf = diffuse_pdf > 0 ? diffuse_pdf : 0;
+
+    float S = 0;
+    float d = -Vector3f::dot(dir, h.getNormal());
+    float c = sqrt(1-d*d);
+    bool even = fmod(shininess, 2.) == 0.;
+    float T = even ? (float)M_PI/2. : c;
+    float A = even ? 0 : 1;
+    float i = even ? 0 : 1;
+
+    while (i <= shininess-2) {
+        S += T;
+        T *= c*c*(i+1.)/(i+2.);
+        i += 2;
+    }
+
+    float specular_pdf = 2*(T + d*A + d*d*S) / (shininess+2);
+    specular_pdf = specular_pdf > 0 ? specular_pdf : 0;
+
+    return prob_spec * specular_pdf + (1-prob_spec) * diffuse_pdf;
+
 }

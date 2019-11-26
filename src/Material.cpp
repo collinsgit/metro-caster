@@ -1,23 +1,23 @@
 #include "Material.h"
 
+#include <cmath>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 Vector3f Material::shade(const Ray &ray,
                          const Hit &hit,
                          const Vector3f &dirToLight,
                          const Vector3f &lightIntensity) {
-    // diffuse
+
     Vector3f surfNormal = hit.getNormal();
-    float diffuseClamp = Vector3f::dot(dirToLight, surfNormal);
-    diffuseClamp = diffuseClamp > 0 ? diffuseClamp : 0;
-
-    Vector3f diffuseLight = diffuseClamp * lightIntensity * _diffuseColor;
-
-    // specular
-    Vector3f eyeToSurf = (ray.getDirection() * hit.getT()).normalized();
+    Vector3f eyeToSurf = ray.getDirection();
     Vector3f reflectedEye = (eyeToSurf - 2 * Vector3f::dot(eyeToSurf, surfNormal) * surfNormal).normalized();
     float specularClamp = Vector3f::dot(dirToLight, reflectedEye);
     specularClamp = specularClamp > 0 ? specularClamp : 0;
 
-    Vector3f specularLight = pow(specularClamp, _shininess) * lightIntensity * _specularColor;
+    Vector3f specularLight = pow(specularClamp, _shininess) * _specularColor;
 
-    return diffuseLight + specularLight + _light;
+    return _diffuseColor / M_PI + (_shininess + 2) * specularLight / (2 * M_PI);
 }
