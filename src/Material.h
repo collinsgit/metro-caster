@@ -42,6 +42,10 @@ public:
         return _light;
     }
 
+    const float &getShininess() const {
+        return _shininess;
+    }
+
     float getRefIndex() const {
         return _refIndex;
     }

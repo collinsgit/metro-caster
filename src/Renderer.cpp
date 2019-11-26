@@ -55,7 +55,6 @@ std::vector<Ray> Renderer::tracePath(Ray r,
         Hit h;
         if (_scene.getGroup()->intersect(r, tmin, h)) {
             Vector3f o = r.pointAtParameter(h.getT());
-
             Vector3f d = _scene.sampler->sample(r, h);
             prob_path *= _scene.sampler->pdf(d, h);
 

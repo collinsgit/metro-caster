@@ -34,5 +34,11 @@ public:
     virtual float pdf(const Vector3f &dir, Hit &h) const override;
 };
 
+class blinnPhong : public Sampler {
+public:
+    virtual Vector3f sample(const Ray &ray, Hit &h) const override;
+    virtual float pdf(const Vector3f &dir, Hit &h) const override;
+};
+
 
 #endif //METROCASTER_SAMPLER_H
