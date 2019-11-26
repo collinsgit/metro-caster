@@ -63,7 +63,7 @@ SceneParser::SceneParser(const std::string &filename) :
 
     // If no lights are specified, set ambient light to white
     // (do solid color ray casting).
-    if (lights.size() == 0) {
+    if (lights.empty()) {
         std::cerr << "WARNING: No lights specified\n";
         _ambient_light = Vector3f(1, 1, 1);
     }
@@ -72,14 +72,10 @@ SceneParser::SceneParser(const std::string &filename) :
 }
 
 SceneParser::~SceneParser() {
-    // FIXME Object3Ds leak. must keep track and delete.
     delete _group;
     delete _camera;
     for (auto *material : _materials) {
         delete material;
-    }
-    for (auto *light : lights) {
-        delete light;
     }
     for (auto *object : _objects) {
         delete object;
@@ -245,7 +241,7 @@ SceneParser::parseMaterial() {
 
 Object3D *
 SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH]) {
-    Object3D *answer = NULL;
+    Object3D *answer = nullptr;
     if (!strcmp(token, "Group")) {
         answer = (Object3D *) parseGroup();
     } else if (!strcmp(token, "Sphere")) {

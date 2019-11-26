@@ -13,6 +13,8 @@ class Mesh : public Object3D {
 public:
     Mesh(const std::string &filename, Material *m);
 
+    virtual ~Mesh() {}
+
     virtual bool intersect(const Ray &r, float tmin, Hit &h) const;
 
     virtual bool intersectTrig(int idx, const Ray &r) const;

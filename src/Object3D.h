@@ -53,6 +53,8 @@ public:
             _radius(radius) {
     }
 
+    virtual ~Sphere() {}
+
     virtual bool intersect(const Ray &r, float tmin, Hit &h) const override;
 
     virtual Ray sample() override;
@@ -64,6 +66,8 @@ private:
 
 class Group : public Object3D {
 public:
+    virtual ~Group() {}
+
     // Return true if intersection found
     virtual bool intersect(const Ray &r, float tmin, Hit &h) const override;
 
@@ -86,6 +90,8 @@ public:
             _normal(normal),
             _d(d) {
     }
+
+    virtual ~Plane() {}
 
     virtual bool intersect(const Ray &r, float tmin, Hit &h) const override;
 
@@ -112,6 +118,8 @@ public:
         _normals[1] = nb;
         _normals[2] = nc;
     }
+
+    virtual ~Triangle() {}
 
     virtual bool intersect(const Ray &ray, float tmin, Hit &hit) const override;
 
@@ -140,6 +148,8 @@ public:
             Object3D(m) {
     }
 
+    virtual ~Torus() {}
+
     virtual bool intersect(const Ray &ray, float tmin, Hit &hit) const override;
 
 private:
@@ -152,6 +162,8 @@ private:
 class Transform : public Object3D {
 public:
     Transform(const Matrix4f &m, Object3D *obj) : _object(obj), _m(m), _m_inverse(m.inverse()) {}
+
+    virtual ~Transform() {}
 
     bool intersect(const Ray &r, float tmin, Hit &h) const override;
 
