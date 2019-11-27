@@ -79,10 +79,10 @@ void Renderer::choosePath(const Ray &r, Object3D *light, float tmin, float lengt
     tracePath(light->sample(), tmin, light_length, light_prob, light_path, light_hits);
 
     // 3. Draw eye path
-    int eye_length = 1 + geometric(generator);
+    int eye_length = 2 + geometric(generator);
     float eye_prob = 1;
     tracePath(r, tmin, eye_length, eye_prob, eye_path, eye_hits);
-    prob_path *= eye_prob;
+    // prob_path *= eye_prob;
 
     // 4. Check for light path obstruction
 //    Ray last_eye = path[path.size() - 1];
@@ -144,44 +144,41 @@ Vector3f Renderer::colorPath(float tmin, Object3D *light, const std::vector<Ray>
     for (int i=0; i<=(int)eye_path.size()-2; i++) {
         incoming = eye_path[i];
         hit = eye_hits[i];
-        float dot;
 
         if (i==eye_path.size()-2) {
             outgoing = connector.getDirection();
             pdf_w = 1;
-            dot = 1;
         } else {
             outgoing = eye_path[i+1].getDirection();
             pdf_w = _scene.sampler->pdf(outgoing, hit);
-            dot = Vector3f::dot(hit.getNormal(), outgoing);
         }
+
+        float dot = 1; // Vector3f::dot(hit.getNormal(), outgoing);
 
         bsdf = hit.getMaterial()->shade(incoming, hit, outgoing);
 
-        lightIntensity = bsdf * dot * lightIntensity / pdf_w;
+        lightIntensity = bsdf * dot * lightIntensity; // / pdf_w;
     }
 
     for (int i=0; i<(int)light_path.size()-2; i++) {
         incoming = light_path[i];
         hit = light_hits[i];
-        float dot;
 
         if (i==light_path.size()-2) {
             outgoing = -connector.getDirection();
             pdf_w = 1;
-            dot = 1;
         } else {
             outgoing = light_path[i+1].getDirection();
             pdf_w = _scene.sampler->pdf(outgoing, hit);
-            dot = Vector3f::dot(hit.getNormal(), outgoing);
         }
+
+        float dot = 1; // Vector3f::dot(hit.getNormal(), outgoing);
 
         bsdf = hit.getMaterial()->shade(incoming, hit, outgoing);
 
-        lightIntensity = bsdf * dot * lightIntensity / pdf_w;
+        lightIntensity = bsdf * dot * lightIntensity; // / pdf_w;
     }
 
-    // lightIntensity.print();
     return lightIntensity;
 }
 
@@ -197,6 +194,7 @@ void Renderer::Render() {
     // It also write to the color image.
     Image image(w, h);
     Camera *cam = _scene.getCamera();
+
     parallel_for(h, [&](int start, int end) {
         for (int i = start; i < end; ++i) {
             float ndcy = 2 * (i / (h - 1.0f)) - 1.0f;
@@ -205,12 +203,12 @@ void Renderer::Render() {
                     // Use PerspectiveCamera to generate a ray.
                     float ndcx = 2 * (j / (w - 1.0f)) - 1.0f;
                     Ray r = cam->generateRay(Vector2f(ndcx, ndcy));
-                    Vector3f color = estimatePixel(r, 0.0001, length, iters);
+                    Vector3f color = estimatePixel(r, 0.01, length, iters);
                     image.setPixel(j, i, color);
                 }
-            });
+            }, false);
         }
-    });
+    }, false);
 
     // Save the output file.
     if (!_args.output_file.empty()) {

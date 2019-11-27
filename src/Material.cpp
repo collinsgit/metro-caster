@@ -12,11 +12,18 @@ Vector3f Material::shade(const Ray &ray,
 
     Vector3f surfNormal = hit.getNormal();
     Vector3f eyeToSurf = ray.getDirection();
+
+    float dot = Vector3f::dot(dirToLight, surfNormal);
+    Vector3f diffuseLight = dot * _diffuseColor;
+
     Vector3f reflectedEye = (eyeToSurf - 2 * Vector3f::dot(eyeToSurf, surfNormal) * surfNormal).normalized();
     float specularClamp = Vector3f::dot(dirToLight, reflectedEye);
+
+    std::cout << specularClamp << "\n";
+
     specularClamp = specularClamp > 0 ? specularClamp : 0;
 
     Vector3f specularLight = pow(specularClamp, _shininess) * _specularColor;
 
-    return _diffuseColor / M_PI + (_shininess + 2) * specularLight / (2 * M_PI);
+    return diffuseLight  + specularLight;
 }
