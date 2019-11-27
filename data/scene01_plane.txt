@@ -19,7 +19,7 @@ Materials {
     }
     Material { diffuseColor 0 1 0 }
     Material { diffuseColor 0 0 1 }
-    Material { diffuseColor 0.9 0.9 0.9
+    Material { diffuseColor 0.2 0.2 0.2
 	specularColor 0.9 0.9 0.9
 	shininess 20}
 	Material { diffuseColor 0.1 0.1 0.1

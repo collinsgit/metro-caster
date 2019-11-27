@@ -54,8 +54,8 @@ void Renderer::tracePath(const Ray &r, float tmin, int length, float &prob_path,
 
     for (int i = 1; i < length; i++) {
         Hit h;
-        if (_scene.getGroup()->intersect(r, tmin, h)) {
-            Vector3f o = r.pointAtParameter(h.getT());
+        if (_scene.getGroup()->intersect(ray, tmin, h)) {
+            Vector3f o = ray.pointAtParameter(h.getT());
             Vector3f d = _scene.sampler->sample(ray, h);
             prob_path *= _scene.sampler->pdf(d, h);
 
