@@ -84,37 +84,6 @@ void Renderer::choosePath(const Ray &r, Object3D *light, float tmin, float lengt
     int eye_length = 2 + geometric(generator);
     float eye_prob = 1;
     tracePath(r, tmin, eye_length, eye_prob, eye_path, eye_hits);
-    // prob_path *= eye_prob;
-
-    // 4. Check for light path obstruction
-//    Ray last_eye = path[path.size() - 1];
-//    Ray last_light = light_path[light_path.size() - 1];
-//
-//    Vector3f dir = last_light.getOrigin() - last_eye.getOrigin();
-//    Ray connector = Ray(last_eye.getOrigin(), dir.normalized());
-//    Hit connector_hit;
-//    _scene.getGroup()->intersect(connector, tmin, connector_hit);
-//
-//    float eps = 0.01;
-//    if (connector_hit.getT() + eps < dir.abs()) {
-//        return path;
-//    }
-//    prob_path *= light_prob;
-//
-//    // 5. Build Complete Path
-//    path[path.size() - 1] = connector;
-//    for (int i = (int) light_path.size() - 1; i > 0; i--) {
-//        path.emplace_back(light_path[i].getOrigin(),
-//                          -light_path[i - 1].getDirection());
-//    }
-//
-//    // Update the hits accordingly.
-//   hits.emplace_back(connector_hit);
-//    for (int i = (int) light_hits.size() - 2; i >= 0; i--) {
-//        hits.emplace_back(light_hits[i]);
-//    }
-//
-//    return path;
 }
 
 void Renderer::precomputeCumulativeBSDF(const std::vector<Ray> &path,
