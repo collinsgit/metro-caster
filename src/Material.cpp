@@ -10,18 +10,19 @@ Vector3f Material::shade(const Ray &ray,
                          const Hit &hit,
                          const Vector3f &dirToLight) {
 
+    // Store the hit normal and incoming ray.
     Vector3f surfNormal = hit.getNormal();
     Vector3f eyeToSurf = ray.getDirection();
 
+    // Calculate the diffuse component.
     float dot = Vector3f::dot(dirToLight, surfNormal);
     Vector3f diffuseLight = dot * _diffuseColor;
 
+    // Calculate the specular component.
     Vector3f reflectedEye = (eyeToSurf - 2 * Vector3f::dot(eyeToSurf, surfNormal) * surfNormal).normalized();
     float specularClamp = Vector3f::dot(dirToLight, reflectedEye);
-
-    specularClamp = specularClamp > 0 ? specularClamp : 0;
-
+    specularClamp = fmax(0, specularClamp);
     Vector3f specularLight = pow(specularClamp, _shininess) * _specularColor;
 
-    return diffuseLight  + specularLight;
+    return diffuseLight + specularLight;
 }

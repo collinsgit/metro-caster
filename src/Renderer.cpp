@@ -41,8 +41,6 @@ Vector3f Renderer::estimatePixel(const Ray &ray, float tmin, float length, int i
 
             choosePath(ray, light, tmin, length, prob_path, eye_path, eye_hits, light_path, light_hits);
             Vector3f path_color = colorPath(tmin, light, eye_path, eye_hits, light_path, light_hits);
-            // TODO: Include probability factor
-            // color += path_color / prob_path;
             color += path_color;
         }
     }, length > 100);
@@ -108,7 +106,7 @@ void Renderer::precomputeCumulativeBSDF(const std::vector<Ray> &path,
         }
         // Also multiplying by:
         // Vector3f::dot(hit.getNormal(), outgoing);
-        // Will also be good once that's added.
+        // Will be good once that's added.
     }
 }
 
@@ -151,13 +149,9 @@ Vector3f Renderer::colorPathCombination(float tmin, Object3D *light, const std::
     Vector3f connectorDir = last_light.getOrigin() - last_eye.getOrigin();
     Ray connector = Ray(last_eye.getOrigin(), connectorDir.normalized());
 
-    // Determine if there is a hit with the scene and terminate early if so.
+    // Find an intersectin with the connector and the scene.
     Hit connector_hit;
     _scene.getGroup()->intersect(connector, tmin, connector_hit);
-    if (connector_hit.getT() + tmin < connectorDir.abs()) {
-        overallDensity += 1;
-        return Vector3f::ZERO;
-    }
 
     // Calculate the overall light intensity.
     // Start off with the initial emitted light, eye path, and light path.
@@ -170,6 +164,12 @@ Vector3f Renderer::colorPathCombination(float tmin, Object3D *light, const std::
     if (light_length >= 3) {
         lightIntensity = lightIntensity * light_bsdf[light_length - 3];
         weight = weight * light_pdfs[light_length - 3];
+    }
+
+    // Terminate early if there is an intersection with the scene.
+    if (connector_hit.getT() + tmin < connectorDir.abs()) {
+        overallDensity += weight;
+        return Vector3f::ZERO;
     }
 
     // Consider the connector (the PDF of the connector is 1).
