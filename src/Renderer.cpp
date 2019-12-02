@@ -149,7 +149,7 @@ Vector3f Renderer::colorPathCombination(float tmin, Object3D *light, const std::
     Vector3f connectorDir = last_light.getOrigin() - last_eye.getOrigin();
     Ray connector = Ray(last_eye.getOrigin(), connectorDir.normalized());
 
-    // Find an intersectin with the connector and the scene.
+    // Find an intersection with the connector and the scene.
     Hit connector_hit;
     _scene.getGroup()->intersect(connector, tmin, connector_hit);
 

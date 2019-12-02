@@ -19,8 +19,8 @@ Vector3f Material::shade(const Ray &ray,
     Vector3f diffuseLight = dot * _diffuseColor;
 
     // Calculate the specular component.
-    Vector3f reflectedEye = (eyeToSurf - 2 * Vector3f::dot(eyeToSurf, surfNormal) * surfNormal).normalized();
-    float specularClamp = Vector3f::dot(dirToLight, reflectedEye);
+    Vector3f halfway = (dirToLight - eyeToSurf).normalized();
+    float specularClamp = Vector3f::dot(surfNormal, halfway);
     specularClamp = fmax(0, specularClamp);
     Vector3f specularLight = pow(specularClamp, _shininess) * _specularColor;
 
