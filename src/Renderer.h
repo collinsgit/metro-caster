@@ -31,7 +31,8 @@ private:
                    std::vector<Hit> &hits) const;
 
     void
-    precomputeCumulativeBSDF(const std::vector<Ray> &path, const std::vector<Hit> &hits, std::vector<Vector3f> &bsdf);
+    precomputeCumulativeBSDF(const std::vector<Ray> &path, const std::vector<Hit> &hits, std::vector<Vector3f> &bsdf,
+                             std::vector<float> &pdf);
 
     Vector3f colorPath(float tmin, Object3D *light, const std::vector<Ray> &eye_path, std::vector<Hit> &eye_hits,
                        const std::vector<Ray> &light_path, std::vector<Hit> &light_hits);
@@ -39,10 +40,13 @@ private:
     Vector3f
     colorPathCombination(float tmin, Object3D *light, const std::vector<Ray> &eye_path,
                          const std::vector<Hit> &eye_hits,
-                         const std::vector<Vector3f> &eye_bsdf, const std::vector<Ray> &light_path,
+                         const std::vector<Vector3f> &eye_bsdf, const std::vector<float> &eye_pdfs,
+                         const std::vector<Ray> &light_path,
                          const std::vector<Hit> &light_hits, const std::vector<Vector3f> &light_bsdf,
+                         const std::vector<float> &light_pdfs,
                          unsigned long eye_length,
-                         unsigned long light_length);
+                         unsigned long light_length,
+                         float &overallDensity);
 
     ArgParser _args;
     SceneParser _scene;

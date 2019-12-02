@@ -14,6 +14,9 @@
 #endif
 
 
+// Beta value for MIS. The value below is recommended by E. Veach.
+const int MIS_BETA = 2.f;
+
 Renderer::Renderer(const ArgParser &args) :
         _args(args),
         _scene(args.input_file) {
@@ -88,20 +91,21 @@ void Renderer::choosePath(const Ray &r, Object3D *light, float tmin, float lengt
 
 void Renderer::precomputeCumulativeBSDF(const std::vector<Ray> &path,
                                         const std::vector<Hit> &hits,
-                                        std::vector<Vector3f> &bsdf) {
+                                        std::vector<Vector3f> &bsdf,
+                                        std::vector<float> &pdf) {
 
     // Find each BSDF iteratively.
     for (unsigned long i = 0; i < path.size() - 2; i++) {
-        Vector3f currentBSDF = hits[i].getMaterial()->shade(path[i], hits[i], path[i + 1].getDirection());
+        float currentPDF = _scene.sampler->pdf(path[i + 1].getDirection(), const_cast<Hit &>(hits[i]));
+        Vector3f currentBSDF = (hits[i].getMaterial()->shade(path[i], hits[i], path[i + 1].getDirection()))
+                               / currentPDF;
         if (i == 0) {
             bsdf.emplace_back(currentBSDF);
+            pdf.emplace_back(pow(currentPDF, MIS_BETA));
         } else {
             bsdf.emplace_back(bsdf[i - 1] * currentBSDF);
+            pdf.emplace_back(pdf[i-1]*pow(currentPDF, MIS_BETA));
         }
-        // Eventually add division by:
-        // _scene.sampler->pdf(path[i+1].getDirection(), hit);
-        // to include the PDF.
-        //
         // Also multiplying by:
         // Vector3f::dot(hit.getNormal(), outgoing);
         // Will also be good once that's added.
@@ -111,31 +115,35 @@ void Renderer::precomputeCumulativeBSDF(const std::vector<Ray> &path,
 Vector3f Renderer::colorPath(float tmin, Object3D *light, const std::vector<Ray> &eye_path, std::vector<Hit> &eye_hits,
                              const std::vector<Ray> &light_path, std::vector<Hit> &light_hits) {
 
-    // First, pre-compute the BSDF for each component of the paths.
+    // First, pre-compute the BSDF and weights for each component of the paths.
+    std::vector<float> eye_pdfs, light_pdfs;
     std::vector<Vector3f> eye_bsdf, light_bsdf;
     if (eye_path.size() > 2) {
-        precomputeCumulativeBSDF(eye_path, eye_hits, eye_bsdf);
+        precomputeCumulativeBSDF(eye_path, eye_hits, eye_bsdf, eye_pdfs);
     }
     if (light_path.size() > 2) {
-        precomputeCumulativeBSDF(light_path, light_hits, light_bsdf);
+        precomputeCumulativeBSDF(light_path, light_hits, light_bsdf, light_pdfs);
     }
 
     // For each combination, find the intensity; average once all are found.
     Vector3f intensity;
+    float overallDensity = 0;
     for (unsigned long i = 2; i <= eye_path.size(); i++) {
         for (unsigned long j = 1; j <= light_path.size(); j++) {
-            intensity += colorPathCombination(tmin, light, eye_path, eye_hits, eye_bsdf, light_path, light_hits,
-                                              light_bsdf, i, j);
+            intensity += colorPathCombination(tmin, light, eye_path, eye_hits, eye_bsdf, eye_pdfs, light_path,
+                                              light_hits, light_bsdf, light_pdfs, i, j, overallDensity);
         }
     }
-    return intensity / float((eye_path.size() - 1) * light_path.size());
+    return intensity / overallDensity;
 }
 
 Vector3f Renderer::colorPathCombination(float tmin, Object3D *light, const std::vector<Ray> &eye_path,
                                         const std::vector<Hit> &eye_hits, const std::vector<Vector3f> &eye_bsdf,
+                                        const std::vector<float> &eye_pdfs,
                                         const std::vector<Ray> &light_path, const std::vector<Hit> &light_hits,
-                                        const std::vector<Vector3f> &light_bsdf, unsigned long eye_length,
-                                        unsigned long light_length) {
+                                        const std::vector<Vector3f> &light_bsdf,
+                                        const std::vector<float> &light_pdfs, unsigned long eye_length,
+                                        unsigned long light_length, float &overallDensity) {
 
     // First, create a connector between the end of the eye segment and the beginning of the light segment.
     Ray last_eye = eye_path[eye_length - 1];
@@ -147,17 +155,21 @@ Vector3f Renderer::colorPathCombination(float tmin, Object3D *light, const std::
     Hit connector_hit;
     _scene.getGroup()->intersect(connector, tmin, connector_hit);
     if (connector_hit.getT() + tmin < connectorDir.abs()) {
-        return Vector3f(0);
+        overallDensity += 1;
+        return Vector3f::ZERO;
     }
 
     // Calculate the overall light intensity.
     // Start off with the initial emitted light, eye path, and light path.
     Vector3f lightIntensity = light->getMaterial()->getLight();
+    float weight = 1;
     if (eye_length >= 3) {
         lightIntensity = lightIntensity * eye_bsdf[eye_length - 3];
+        weight = weight * eye_pdfs[eye_length - 3];
     }
     if (light_length >= 3) {
         lightIntensity = lightIntensity * light_bsdf[light_length - 3];
+        weight = weight * light_pdfs[light_length - 3];
     }
 
     // Consider the connector (the PDF of the connector is 1).
@@ -177,7 +189,10 @@ Vector3f Renderer::colorPathCombination(float tmin, Object3D *light, const std::
         float lightDot = 1; // Vector3f::dot(lastLightHit.getNormal(), -connector.getDirection());
         lightIntensity = lightIntensity * lastLight_bsdf * lightDot;
     }
-    return lightIntensity;
+
+    // Record the weight, apply it, and return.
+    overallDensity += weight;
+    return weight*lightIntensity;
 }
 
 void Renderer::Render() {
@@ -204,9 +219,9 @@ void Renderer::Render() {
                     Vector3f color = estimatePixel(r, 0.01, length, iters);
                     image.setPixel(j, i, color);
                 }
-            }, false);
+            }, true);
         }
-    }, false);
+    }, true);
 
     // Save the output file.
     if (!_args.output_file.empty()) {
