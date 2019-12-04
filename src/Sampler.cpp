@@ -131,3 +131,35 @@ float blinnPhong::pdf(const Vector3f &dir, Hit &h) const {
     return prob_spec * specular_pdf + (1-prob_spec) * diffuse_pdf;
 
 }
+
+Vector3f experimental::sample(const Ray &ray, Hit &h) const {
+    Vector3f diff = h.getMaterial()->getDiffuseColor();
+    Vector3f spec = h.getMaterial()->getSpecularColor();
+    float prob_spec = 1.f / (1.f + (diff[0] + diff[1] + diff[2]) / (spec[0] + spec[1] + spec[2]));
+
+    std::default_random_engine generator(rand());
+    std::uniform_real_distribution<float> uniform(0.f, 1.f);
+
+    if (uniform(generator) > prob_spec) {
+        Sampler* sampler = new cosineWeightedHemisphere;
+        return sampler->sample(ray, h);
+    } else {
+        Sampler* sampler = new pureReflectance;
+        return sampler->sample(ray, h);
+    }
+}
+
+float experimental::pdf(const Vector3f &dir, Hit &h) const {
+    Vector3f diff = h.getMaterial()->getDiffuseColor();
+    Vector3f spec = h.getMaterial()->getSpecularColor();
+    float prob_spec = 1.f / (1.f + (diff[0] + diff[1] + diff[2]) / (spec[0] + spec[1] + spec[2]));
+
+    float pdf = 0;
+    Sampler* sampler_diff = new cosineWeightedHemisphere;
+    pdf += (1-prob_spec) * sampler_diff->pdf(dir, h);
+    Sampler* sampler_ref = new pureReflectance;
+    pdf += prob_spec * sampler_ref->pdf(dir, h);
+
+    return pdf;
+}
+
