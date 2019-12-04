@@ -107,7 +107,7 @@ bool Area::intersect(const Ray &r, float tmin, Hit &h) const {
     // See if the ray intersects the plane containing the rectangle.
     float t = Vector3f::dot(_corner - r.getOrigin(), _normal) / Vector3f::dot(r.getDirection(), _normal);
     Vector3f P0P = _corner - r.pointAtParameter(t);
-    if (Vector3f::dot(P0P.normalized(), _normal) != 0) {
+    if (abs(Vector3f::dot(P0P.normalized(), _normal)) > 0.01) {
         return false;
     }
 
@@ -116,7 +116,7 @@ bool Area::intersect(const Ray &r, float tmin, Hit &h) const {
     Vector3f Q2 = (Vector3f::dot(P0P, _sideTwo) / _sideTwo.absSquared()) * _sideTwo;
     if (0 <= Q1.abs() && Q1.abs() <= _sideOne.abs() && 0 <= Q2.abs() && Q2.abs() <= _sideTwo.abs()) {
         // Check if t is in bounds.
-        if (t <= tmin) {
+        if (t <= tmin || t > h.getT()) {
             return false;
         }
 
