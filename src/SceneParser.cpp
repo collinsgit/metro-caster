@@ -248,6 +248,8 @@ SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH]) {
         answer = (Object3D *) parseTorus();
     } else if (!strcmp(token, "Plane")) {
         answer = (Object3D *) parsePlane();
+    } else if (!strcmp(token, "Area")) {
+        answer = (Object3D *) parseArea();
     } else if (!strcmp(token, "Triangle")) {
         answer = (Object3D *) parseTriangle();
     } else if (!strcmp(token, "TriangleMesh")) {
@@ -364,6 +366,26 @@ SceneParser::parsePlane() {
     assert(!strcmp(token, "}"));
     assert(_current_material != NULL);
     return new Plane(normal, offset, _current_material);
+}
+
+Area *
+SceneParser::parseArea() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    getToken(token);
+    assert(!strcmp(token, "{"));
+    getToken(token);
+    assert(!strcmp(token, "corner"));
+    Vector3f corner = readVector3f();
+    getToken(token);
+    assert(!strcmp(token, "sideOne"));
+    Vector3f sideOne = readVector3f();
+    getToken(token);
+    assert(!strcmp(token, "sideTwo"));
+    Vector3f sideTwo = readVector3f();
+    getToken(token);
+    assert(!strcmp(token, "}"));
+    assert(_current_material != NULL);
+    return new Area(corner, sideOne, sideTwo, _current_material);
 }
 
 Triangle *

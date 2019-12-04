@@ -100,6 +100,33 @@ private:
     float _d;
 };
 
+// If we want we can extend to more than rectangles, but for now this
+// is just going to be a rectangle.
+class Area : public Object3D {
+public:
+    Area(Vector3f &corner,
+         Vector3f &sideOne,
+         Vector3f &sideTwo,
+         Material *m) : Object3D(m), _corner(corner),
+                        _sideOne(sideOne), _sideTwo(sideTwo),
+                        _normal(Vector3f::cross(sideOne,
+                                                sideTwo).normalized()) {
+
+    }
+
+    virtual ~Area() {}
+
+    virtual bool intersect(const Ray &r, float tmin, Hit &h) const override;
+
+    virtual const Ray sample() override;
+
+private:
+    Vector3f _corner;
+    Vector3f _sideOne;
+    Vector3f _sideTwo;
+    Vector3f _normal;
+
+};
 
 class Triangle : public Object3D {
 public:

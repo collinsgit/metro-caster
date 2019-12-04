@@ -83,6 +83,8 @@ private:
 
     Plane *parsePlane();
 
+    Area *parseArea();
+
     Triangle *parseTriangle();
 
     Mesh *parseTriangleMesh();

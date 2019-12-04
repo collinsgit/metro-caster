@@ -2,6 +2,7 @@
 
 #include "Object3D.h"
 #include "quartic.cpp"
+#include "Sampler.h"
 #include <cmath>
 #include <random>
 
@@ -63,7 +64,7 @@ const Ray Sphere::sample() {
 
     float theta = theta_dist(generator);
     float cosphi = cosphi_dist(generator);
-    float factor = sqrt(1 - cosphi*cosphi);
+    float factor = sqrt(1 - cosphi * cosphi);
 
     Vector3f dir(factor * cos(theta),
                  factor * sin(theta),
@@ -100,6 +101,47 @@ bool Plane::intersect(const Ray &r, float tmin, Hit &h) const {
         return true;
     }
     return false;
+}
+
+bool Area::intersect(const Ray &r, float tmin, Hit &h) const {
+    // See if the ray intersects the plane containing the rectangle.
+    float t = Vector3f::dot(_corner - r.getOrigin(), _normal) / Vector3f::dot(r.getDirection(), _normal);
+    Vector3f P0P = _corner - r.pointAtParameter(t);
+    if (Vector3f::dot(P0P.normalized(), _normal) != 0) {
+        return false;
+    }
+
+    // See if the point is in the rectangle.
+    Vector3f Q1 = (Vector3f::dot(P0P, _sideOne) / _sideOne.absSquared()) * _sideOne;
+    Vector3f Q2 = (Vector3f::dot(P0P, _sideTwo) / _sideTwo.absSquared()) * _sideTwo;
+    if (0 <= Q1.abs() && Q1.abs() <= _sideOne.abs() && 0 <= Q2.abs() && Q2.abs() <= _sideTwo.abs()) {
+        // Check if t is in bounds.
+        if (t <= tmin) {
+            return false;
+        }
+
+        // Set the hit.
+        h.set(t, this->material, _normal);
+        return true;
+    }
+    return false;
+}
+
+const Ray Area::sample() {
+    // First, select a random point on the area.
+    // Create generators for the sampling and get random lengths.
+    std::default_random_engine generator(rand());
+    std::uniform_real_distribution<float> sideOneDist(0., _sideOne.abs());
+    std::uniform_real_distribution<float> sideTwoDist(0., _sideTwo.abs());
+    float sideOneScale = sideOneDist(generator);
+    float sideTwoScale = sideTwoDist(generator);
+
+    // Fetch the random point and use a cosine weighted sampler (first two args don't matter).
+    Vector3f source = _corner + sideOneScale * _sideOne.normalized() + sideTwoScale * _sideTwo.normalized();
+    Hit cosineWeightedHit;
+    cosineWeightedHit.set(0, this->material, _normal);
+    Sampler *sampler = new cosineWeightedHemisphere;
+    return Ray(source, sampler->sample(Ray(source, _normal), cosineWeightedHit).normalized());
 }
 
 bool Triangle::intersect(const Ray &r, float tmin, Hit &h) const {
