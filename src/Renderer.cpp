@@ -59,7 +59,7 @@ void Renderer::tracePath(const Ray &r, float tmin, int length, float &prob_path,
         if (_scene.getGroup()->intersect(ray, tmin, h)) {
             Vector3f o = ray.pointAtParameter(h.getT());
             Vector3f d = _scene.sampler->sample(ray, h);
-            prob_path *= _scene.sampler->pdf(d, h);
+            prob_path *= _scene.sampler->pdf(ray, d, h);
 
             ray = Ray(o, d);
             path.push_back(ray);
@@ -94,7 +94,7 @@ void Renderer::precomputeCumulativeBSDF(const std::vector<Ray> &path,
 
     // Find each BSDF iteratively.
     for (unsigned long i = 0; i < path.size() - 2; i++) {
-        float currentPDF = _scene.sampler->pdf(path[i + 1].getDirection(), const_cast<Hit &>(hits[i]));
+        float currentPDF = _scene.sampler->pdf(path[i], path[i + 1].getDirection(), const_cast<Hit &>(hits[i]));
         Vector3f currentBSDF = (hits[i].getMaterial()->shade(path[i], hits[i], path[i + 1].getDirection()))
                                / currentPDF;
         if (i == 0) {

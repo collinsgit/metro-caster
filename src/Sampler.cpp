@@ -25,7 +25,7 @@ Vector3f cosineWeightedHemisphere::sample(const Ray &ray, Hit &h) const {
     return r * normal + factor * (sin(v) * x + cos(v) * y);
 }
 
-float cosineWeightedHemisphere::pdf(const Vector3f &dir, Hit &h) const {
+float cosineWeightedHemisphere::pdf(const Ray &ray, const Vector3f &dir, Hit &h) const {
     float dot = Vector3f::dot(dir, h.getNormal());
     dot = dot < 0 ? 0 : dot;
     return dot / M_PI;
@@ -35,7 +35,7 @@ Vector3f pureReflectance::sample(const Ray &ray, Hit &h) const {
     return (ray.getDirection() - 2 * Vector3f::dot(ray.getDirection(), h.getNormal()) * h.getNormal()).normalized();
 }
 
-float pureReflectance::pdf(const Vector3f &dir, Hit &h) const {
+float pureReflectance::pdf(const Ray &ray, const Vector3f &dir, Hit &h) const {
     return 1;
 }
 
@@ -102,7 +102,7 @@ Vector3f blinnPhong::sample(const Ray &ray, Hit &h) const {
     return output;
 }
 
-float blinnPhong::pdf(const Vector3f &dir, Hit &h) const {
+float blinnPhong::pdf(const Ray &ray, const Vector3f &dir, Hit &h) const {
     float shininess = h.getMaterial()->getShininess();
     Vector3f diff = h.getMaterial()->getDiffuseColor();
     Vector3f spec = h.getMaterial()->getSpecularColor();
@@ -111,8 +111,10 @@ float blinnPhong::pdf(const Vector3f &dir, Hit &h) const {
     float diffuse_pdf = Vector3f::dot(dir, h.getNormal()) / M_PI;
     diffuse_pdf = diffuse_pdf > 0 ? diffuse_pdf : 0;
 
+
+    Vector3f ref_dir = (ray.getDirection() - 2 * Vector3f::dot(ray.getDirection(), h.getNormal()) * h.getNormal()).normalized();
     float S = 0;
-    float d = Vector3f::dot(dir, h.getNormal());
+    float d = Vector3f::dot(ref_dir, h.getNormal());
     float c = sqrt(1-d*d);
     bool even = fmod(shininess, 2.) == 0.;
     float T = even ? 2.f*c : (float)M_PI;
@@ -125,7 +127,8 @@ float blinnPhong::pdf(const Vector3f &dir, Hit &h) const {
         i = i+2;
     }
 
-    float specular_pdf = (A + d*(S)) / (shininess+1);
+    float specular_norm = (A + d*(S)) / (shininess+1);
+    float specular_pdf = pow(Vector3f::dot(ref_dir, dir), shininess) / specular_norm;
     specular_pdf = specular_pdf > 0 ? specular_pdf : 0;
 
     return prob_spec * specular_pdf + (1-prob_spec) * diffuse_pdf;
@@ -149,16 +152,16 @@ Vector3f experimental::sample(const Ray &ray, Hit &h) const {
     }
 }
 
-float experimental::pdf(const Vector3f &dir, Hit &h) const {
+float experimental::pdf(const Ray &ray, const Vector3f &dir, Hit &h) const {
     Vector3f diff = h.getMaterial()->getDiffuseColor();
     Vector3f spec = h.getMaterial()->getSpecularColor();
     float prob_spec = 1.f / (1.f + (diff[0] + diff[1] + diff[2]) / (spec[0] + spec[1] + spec[2]));
 
     float pdf = 0;
     Sampler* sampler_diff = new cosineWeightedHemisphere;
-    pdf += (1-prob_spec) * sampler_diff->pdf(dir, h);
+    pdf += (1-prob_spec) * sampler_diff->pdf(ray, dir, h);
     Sampler* sampler_ref = new pureReflectance;
-    pdf += prob_spec * sampler_ref->pdf(dir, h);
+    pdf += prob_spec * sampler_ref->pdf(ray, dir, h);
 
     return pdf;
 }
