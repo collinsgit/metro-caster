@@ -96,8 +96,6 @@ SceneParser::parseFile() {
             parsePerspectiveCamera();
         } else if (!strcmp(token, "Background")) {
             parseBackground();
-        } else if (!strcmp(token, "Lights")) {
-            // parseLights();
         } else if (!strcmp(token, "Materials")) {
             parseMaterials();
         } else if (!strcmp(token, "Group")) {

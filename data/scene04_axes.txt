@@ -6,29 +6,38 @@ PerspectiveCamera {
     angle 30
 }
 
-Lights {
-    numLights 1
-    DirectionalLight {
-        direction -0.2 -0.4 -0.8
-        color 0.8 0.8 0.8
-    }
-}
-
 Background {
     color 0 0 0 
     ambientLight 0.2 0.2 0.2
 }
 
 Materials {
-    numMaterials 4
-    Material { diffuseColor 1 0 0 }
-    Material { diffuseColor 0 1 0 }
-    Material { diffuseColor 0 0 1 }
-    Material { diffuseColor 1 1 1 }
+    numMaterials 6
+    Material {
+        diffuseColor 1 0 0
+    }
+    Material {
+        diffuseColor 0 1 0
+    }
+    Material {
+        diffuseColor 0 0 1
+    }
+    Material {
+        diffuseColor 1 1 1
+    }
+    Material {
+        diffuseColor 0.5 0.5 0.5
+    	specularColor 0.5 0.5 0.5
+    	shininess 20
+    }
+    Material {
+        diffuseColor 0.1 0.1 0.1
+        light 0.9 0.9 0.9
+    }
 }
 
 Group {
-    numObjects 2
+    numObjects 9
     Group {
         numObjects 3   
         MaterialIndex 0
@@ -66,5 +75,37 @@ Group {
         TriangleMesh {
              obj_file models/cube2.obj
         }
+    }
+
+    MaterialIndex 4
+    Plane {
+        normal 0 1 0
+        offset -2
+    }
+    Plane {
+        normal 0 -1 0
+        offset -30
+        }
+    Plane {
+        normal 1 0 0
+        offset -30
+    }
+    Plane {
+        normal 0 0 1
+        offset -30
+    }
+    Plane {
+        normal -1 0 0
+        offset -30
+    }
+    Plane {
+        normal 0 0 -1
+        offset -30
+    }
+
+    MaterialIndex 5
+    Sphere {
+        center 13 16 28
+        radius 0.5
     }
 }

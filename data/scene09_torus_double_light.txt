@@ -48,7 +48,7 @@ Materials {
 }
 
 Group {
-    numObjects 10
+    numObjects 9
 
     MaterialIndex 0
     Plane {
@@ -95,10 +95,6 @@ Group {
     MaterialIndex 4
     Sphere {
         center -5.3 3 6.3
-        radius 0.3
-    }
-    Sphere {
-        center 0 3 6.3
         radius 0.3
     }
 }
