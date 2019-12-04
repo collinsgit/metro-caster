@@ -41,7 +41,9 @@ float pureReflectance::pdf(const Vector3f &dir, Hit &h) const {
 
 Vector3f blinnPhong::sample(const Ray &ray, Hit &h) const {
     float shininess = h.getMaterial()->getShininess();
-    float prob_spec = (2 + shininess) / (5 + shininess);
+    Vector3f diff = h.getMaterial()->getDiffuseColor();
+    Vector3f spec = h.getMaterial()->getSpecularColor();
+    float prob_spec = 1.f / (1.f + (diff[0] + diff[1] + diff[2]) / (spec[0] + spec[1] + spec[2]));
     int max_iters = 10;
 
     std::default_random_engine generator(rand());
@@ -102,26 +104,28 @@ Vector3f blinnPhong::sample(const Ray &ray, Hit &h) const {
 
 float blinnPhong::pdf(const Vector3f &dir, Hit &h) const {
     float shininess = h.getMaterial()->getShininess();
-    float prob_spec = (2 + shininess) / (5 + shininess);
+    Vector3f diff = h.getMaterial()->getDiffuseColor();
+    Vector3f spec = h.getMaterial()->getSpecularColor();
+    float prob_spec = 1.f / (1.f + (diff[0] + diff[1] + diff[2]) / (spec[0] + spec[1] + spec[2]));
 
     float diffuse_pdf = Vector3f::dot(dir, h.getNormal()) / M_PI;
     diffuse_pdf = diffuse_pdf > 0 ? diffuse_pdf : 0;
 
     float S = 0;
-    float d = -Vector3f::dot(dir, h.getNormal());
+    float d = Vector3f::dot(dir, h.getNormal());
     float c = sqrt(1-d*d);
     bool even = fmod(shininess, 2.) == 0.;
-    float T = even ? (float)M_PI/2. : c;
-    float A = even ? 0 : 1;
-    float i = even ? 0 : 1;
+    float T = even ? 2.f*c : (float)M_PI;
+    float A = even ? (float)2*(M_PI-acos(d)) : (float)M_PI;
+    float i = even ? 1 : 0;
 
-    while (i <= shininess-2) {
-        S += T;
-        T *= c*c*(i+1.)/(i+2.);
-        i += 2;
+    while (i <= shininess-1) {
+        S = S+T;
+        T = T*c*c*(i+1.)/(i+2.);
+        i = i+2;
     }
 
-    float specular_pdf = 2*(T + d*A + d*d*S) / (shininess+2);
+    float specular_pdf = (A + d*(S)) / (shininess+1);
     specular_pdf = specular_pdf > 0 ? specular_pdf : 0;
 
     return prob_spec * specular_pdf + (1-prob_spec) * diffuse_pdf;

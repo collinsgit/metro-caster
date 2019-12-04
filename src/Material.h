@@ -16,7 +16,7 @@ public:
              const Vector3f &specularColor = Vector3f::ZERO,
              const Vector3f &transColor = Vector3f::ZERO,
              const Vector3f &light = Vector3f::ZERO,
-             float shininess = 0,
+             float shininess = 1,
              float refIndex = 0
     ) :
             _diffuseColor(diffuseColor),

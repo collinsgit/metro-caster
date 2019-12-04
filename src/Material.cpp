@@ -15,8 +15,9 @@ Vector3f Material::shade(const Ray &ray,
     Vector3f eyeToSurf = ray.getDirection();
 
     // Calculate the diffuse component.
-    float dot = Vector3f::dot(dirToLight, surfNormal);
-    Vector3f diffuseLight = dot * _diffuseColor;
+    float diffuseClamp = Vector3f::dot(dirToLight, surfNormal);
+    diffuseClamp = fmax(0, diffuseClamp);
+    Vector3f diffuseLight = diffuseClamp * _diffuseColor;
 
     // Calculate the specular component.
     Vector3f halfway = (dirToLight - eyeToSurf).normalized();
