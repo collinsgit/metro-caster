@@ -205,7 +205,7 @@ SceneParser::parseMaterial() {
     char filename[MAX_PARSER_TOKEN_LENGTH];
     filename[0] = 0;
     Vector3f diffuseColor(1), specularColor(0), transColor(0), light(0);
-    float shininess = 0;
+    float shininess = 1;
     float refIndex = 1;
     getToken(token);
     assert(!strcmp(token, "{"));
