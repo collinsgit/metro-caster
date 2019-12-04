@@ -190,6 +190,15 @@ Vector3f Renderer::colorPathCombination(float tmin, Object3D *light, const std::
         lightIntensity = lightIntensity * lastLight_bsdf * lightDot;
     }
 
+    // Add on light found on the way
+    for (int i=0; i<eye_length-1; i++) {
+        Hit h = eye_hits[i];
+        if (h.getMaterial()->getLight() != Vector3f::ZERO) {
+            Vector3f bsdf = i > 0 ? eye_bsdf[i-1] : Vector3f(1.);
+            lightIntensity += bsdf * h.getMaterial()->getLight();
+        }
+    }
+
     // Record the weight, apply it, and return.
     overallDensity += weight;
     return weight*lightIntensity;
