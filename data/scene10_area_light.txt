@@ -12,12 +12,11 @@ Materials {
         specularColor 1 1 1
     }
     Material {
-        diffuseColor 1 1 1
-        light .8 .8 .8
+        light 1 1 1
     }
 
     Material {
-        specularColor 0.5 0.5 0.5
+        diffuseColor 0.5 0.5 0.5
     }
     Material {
         diffuseColor .5 .25 .25
@@ -30,7 +29,7 @@ Materials {
     }
     Material {
         diffuseColor 0 0 0
-        specularColor 0.5 0.5 0.5
+        specularColor 0.0001 0.0001 0.0001
     }
 }
 
@@ -49,7 +48,7 @@ Group {
 
     MaterialIndex 1
     Area {
-        corner 0 2 2.25
+        corner 0 3 3
         sideOne 0 0 -0.5
         sideTwo 0.5 0 0
     }

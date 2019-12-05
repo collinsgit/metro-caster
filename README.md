@@ -1,2 +1,2 @@
 # metro-caster
-Metropolis Light Transport Implementation and Exploration
+Bidirectional Path Tracing with Multiple Importance Sampling
